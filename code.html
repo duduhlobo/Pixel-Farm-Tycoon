@@ -1,0 +1,4311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pixel Farm Tycoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <style>
+        /* ===== CSS RESET ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            touch-action: none; 
+            -ms-touch-action: none;
+            font-family: 'VT323', monospace;
+        }
+
+        /* ===== CUSTOM PROPERTIES ===== */
+        :root {
+            --transition-fast: 150ms;
+            --transition-normal: 300ms;
+            --transition-slow: 500ms;
+            --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+            --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            --space-xs: 8px;
+            --space-sm: 16px;
+            --space-md: 24px;
+            --space-lg: 32px;
+            --space-xl: 48px;
+            --color-bg: #8BC34A;
+            --color-ui: #D2B48C;
+            --color-text: #333333;
+            --color-button: #8B4513;
+            --color-button-hover: #A0522D;
+        }
+
+        /* ===== BASE STYLES ===== */
+        body {
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            font-size: 24px;
+            color: var(--color-text);
+        }
+
+        /* ===== LAYOUT SECTIONS ===== */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm);
+            background: var(--color-ui);
+            border-bottom: 4px solid var(--color-button);
+            flex-shrink: 0;
+        }
+
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: var(--space-sm);
+            background: var(--color-ui);
+            border-top: 4px solid var(--color-button);
+            flex-shrink: 0;
+        }
+
+        /* ===== RESPONSIVE LAYOUT MODES ===== */
+        /* Mobile Portrait (default) */
+        @media (max-width: 599px) and (orientation: portrait) {
+            body {
+                flex-direction: column;
+            }
+
+            .header {
+                height: auto;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+            }
+
+            .main {
+                height: auto;
+                min-height: 400px;
+                flex: 1;
+            }
+
+            .footer {
+                height: auto;
+                min-height: 120px;
+                flex-direction: row;
+                gap: var(--space-sm);
+            }
+
+            .coin-display {
+                font-size: 28px;
+                min-width: 140px;
+            }
+
+            .powerups-container {
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+            }
+
+            .powerup-item {
+                width: 70px;
+                height: 70px;
+            }
+
+            .powerup-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .expand-button {
+                min-width: 120px;
+                min-height: 80px;
+                font-size: 20px;
+            }
+
+            .expand-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .ui-button {
+                min-width: 120px;
+                min-height: 80px;
+                font-size: 24px;
+            }
+
+            .ui-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            #farmCanvas {
+                max-width: 90vw;
+                max-height: 50vh;
+            }
+        }
+
+        /* Mobile Landscape */
+        @media (max-width: 599px) and (orientation: landscape) {
+            body {
+                flex-direction: row;
+            }
+
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                min-height: 60px;
+                z-index: 100;
+                flex-wrap: nowrap;
+                gap: var(--space-xs);
+                padding: var(--space-xs);
+            }
+
+            .main {
+                margin-top: 70px;
+                margin-bottom: 0;
+                margin-right: 160px;
+                flex: 1;
+                min-height: calc(100vh - 70px);
+            }
+
+            .footer {
+                position: fixed;
+                right: 0;
+                top: 70px;
+                bottom: 0;
+                width: 160px;
+                height: auto;
+                flex-direction: column;
+                gap: var(--space-xs);
+                padding: var(--space-xs);
+                border-top: none;
+                border-left: 4px solid var(--color-button);
+            }
+
+            .coin-display {
+                font-size: 20px;
+                min-width: 100px;
+                padding: var(--space-xs);
+            }
+
+            .coin-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .powerups-container {
+                flex-wrap: nowrap;
+                gap: var(--space-xs);
+                overflow-x: auto;
+            }
+
+            .powerup-item {
+                width: 60px;
+                height: 60px;
+                flex-shrink: 0;
+            }
+
+            .powerup-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .expand-button {
+                min-width: 100px;
+                min-height: 70px;
+                font-size: 16px;
+                padding: var(--space-xs);
+            }
+
+            .expand-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .ui-button {
+                min-width: 100px;
+                min-height: 70px;
+                font-size: 18px;
+                padding: var(--space-xs);
+            }
+
+            .ui-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            #farmCanvas {
+                max-width: 80vw;
+                max-height: 90vh;
+            }
+        }
+
+        /* Tablet Portrait */
+        @media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+            body {
+                flex-direction: column;
+            }
+
+            .header {
+                height: auto;
+                min-height: 90px;
+                flex-wrap: nowrap;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .main {
+                height: auto;
+                min-height: 500px;
+                flex: 1;
+            }
+
+            .footer {
+                height: auto;
+                min-height: 110px;
+                flex-direction: row;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .coin-display {
+                font-size: 30px;
+                min-width: 150px;
+            }
+
+            .powerups-container {
+                flex-wrap: wrap;
+                gap: var(--space-md);
+            }
+
+            .powerup-item {
+                width: 75px;
+                height: 75px;
+            }
+
+            .powerup-icon {
+                width: 44px;
+                height: 44px;
+            }
+
+            .expand-button {
+                min-width: 130px;
+                min-height: 90px;
+                font-size: 22px;
+            }
+
+            .expand-icon {
+                width: 30px;
+                height: 30px;
+            }
+
+            .ui-button {
+                min-width: 130px;
+                min-height: 90px;
+                font-size: 26px;
+            }
+
+            .ui-icon {
+                width: 38px;
+                height: 38px;
+            }
+
+            #farmCanvas {
+                max-width: 88vw;
+                max-height: 65vh;
+            }
+        }
+
+        /* Tablet Landscape */
+        @media (min-width: 600px) and (max-width: 1024px) and (orientation: landscape) {
+            body {
+                flex-direction: row;
+            }
+
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                min-height: 70px;
+                z-index: 100;
+                flex-wrap: nowrap;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .main {
+                margin-top: 80px;
+                margin-bottom: 0;
+                margin-right: 200px;
+                flex: 1;
+                min-height: calc(100vh - 80px);
+            }
+
+            .footer {
+                position: fixed;
+                right: 0;
+                top: 80px;
+                bottom: 0;
+                width: 200px;
+                height: auto;
+                flex-direction: column;
+                gap: var(--space-md);
+                padding: var(--space-md);
+                border-top: none;
+                border-left: 4px solid var(--color-button);
+            }
+
+            .coin-display {
+                font-size: 26px;
+                min-width: 130px;
+                padding: var(--space-sm);
+            }
+
+            .coin-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .powerups-container {
+                flex-wrap: nowrap;
+                gap: var(--space-md);
+                overflow-x: auto;
+            }
+
+            .powerup-item {
+                width: 70px;
+                height: 70px;
+                flex-shrink: 0;
+            }
+
+            .powerup-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .expand-button {
+                min-width: 120px;
+                min-height: 80px;
+                font-size: 18px;
+                padding: var(--space-sm);
+            }
+
+            .expand-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .ui-button {
+                min-width: 120px;
+                min-height: 80px;
+                font-size: 20px;
+                padding: var(--space-sm);
+            }
+
+            .ui-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            #farmCanvas {
+                max-width: 82vw;
+                max-height: 92vh;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 1025px) {
+            body {
+                flex-direction: column;
+            }
+
+            .header {
+                height: auto;
+                min-height: 100px;
+                flex-wrap: nowrap;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .main {
+                height: auto;
+                min-height: 600px;
+                flex: 1;
+            }
+
+            .footer {
+                height: auto;
+                min-height: 120px;
+                flex-direction: row;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .coin-display {
+                font-size: 32px;
+                min-width: 160px;
+            }
+
+            .powerups-container {
+                flex-wrap: nowrap;
+                gap: var(--space-md);
+            }
+
+            .powerup-item {
+                width: 80px;
+                height: 80px;
+            }
+
+            .powerup-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .expand-button {
+                min-width: 140px;
+                min-height: 96px;
+                font-size: 24px;
+            }
+
+            .expand-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .ui-button {
+                min-width: 140px;
+                min-height: 96px;
+                font-size: 28px;
+            }
+
+            .ui-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            #farmCanvas {
+                max-width: 85vw;
+                max-height: 70vh;
+            }
+        }
+
+        /* ===== HEADER COMPONENTS ===== */
+        .coin-display {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 32px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.3);
+            padding: var(--space-sm);
+            border-radius: 8px;
+            border: 2px solid var(--color-button);
+        }
+
+        .coin-icon {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+        }
+
+        .powerups-container {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .powerup-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--color-button);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition-fast) var(--ease-out);
+        }
+
+        .powerup-item:hover:not(.powerup-cooldown) {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .powerup-item:active:not(.powerup-cooldown) {
+            transform: scale(0.95);
+        }
+
+        .powerup-item.powerup-cooldown {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .powerup-icon {
+            width: 48px;
+            height: 48px;
+            image-rendering: pixelated;
+        }
+
+        .powerup-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: #FF6B6B;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            opacity: 0.9;
+        }
+
+        .powerup-badge.hidden {
+            display: none;
+        }
+
+        .powerup-timer {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .powerup-timer-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 100%;
+            transition: width 100ms linear;
+        }
+
+        .powerup-timer-fill.cooldown {
+            background: #FF9800;
+        }
+
+        .expand-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: var(--color-button);
+            color: white;
+            border: none;
+            padding: var(--space-xs);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 24px;
+            min-width: 140px;
+            min-height: 96px;
+            transition: background var(--transition-fast) var(--ease-out);
+        }
+
+        .expand-button:hover {
+            background: var(--color-button-hover);
+        }
+
+        .expand-button:active {
+            transform: scale(0.95);
+        }
+
+        .expand-button:disabled {
+            background: #888;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .expand-icon {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+        }
+
+        /* ===== CANVAS ===== */
+        #farmCanvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            border: 4px solid var(--color-button);
+            background: var(--color-bg);
+            cursor: pointer;
+        }
+
+        /* ===== FOOTER BUTTONS ===== */
+        .ui-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: var(--color-button);
+            color: white;
+            border: none;
+            padding: var(--space-sm);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 28px;
+            min-width: 140px;
+            min-height: 96px;
+            transition: background var(--transition-fast) var(--ease-out);
+        }
+
+        .ui-button:hover {
+            background: var(--color-button-hover);
+        }
+
+        .ui-button:active {
+            transform: scale(0.95);
+        }
+
+        .ui-icon {
+            width: 40px;
+            height: 40px;
+            image-rendering: pixelated;
+        }
+
+        /* ===== OVERLAYS ===== */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn var(--transition-normal) var(--ease-out);
+        }
+
+        .overlay.active {
+            display: flex;
+            animation: fadeIn var(--transition-normal) var(--ease-out);
+        }
+
+        .panel {
+            background: var(--color-ui);
+            border: 4px solid var(--color-button);
+            border-radius: 16px;
+            padding: var(--space-lg);
+            max-width: 90%;
+            max-height: 80%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            animation: scaleIn var(--transition-normal) var(--ease-bounce);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: var(--space-md);
+            flex-shrink: 0;
+        }
+
+        .grid-container {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            padding-right: 8px;
+        }
+
+        .grid-container::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .grid-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+
+        .grid-container::-webkit-scrollbar-thumb {
+            background: var(--color-button);
+            border-radius: 6px;
+        }
+
+        .grid-container::-webkit-scrollbar-thumb:hover {
+            background: var(--color-button-hover);
+        }
+
+        .close-button {
+            background: #D32F2F;
+            color: white;
+            border: none;
+            padding: var(--space-sm);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 28px;
+            min-width: 120px;
+            min-height: 64px;
+        }
+
+        .close-button:hover {
+            background: #B71C1C;
+        }
+
+        /* ===== SHOP GRID ===== */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .shop-item {
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid var(--color-button);
+            border-radius: 8px;
+            padding: var(--space-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            transition: transform var(--transition-fast) var(--ease-out);
+        }
+
+        .shop-item:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .shop-item:active {
+            transform: scale(0.95);
+        }
+
+        .shop-item-icon {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+        }
+
+        .shop-item-name {
+            font-size: 24px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .shop-item-cost {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 28px;
+            font-weight: bold;
+            color: #FF9800;
+        }
+
+        /* ===== INVENTORY GRID ===== */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid var(--color-button);
+            border-radius: 8px;
+            padding: var(--space-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .inventory-item-icon {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+        }
+
+        .inventory-item-name {
+            font-size: 24px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .inventory-item-quantity {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            50% { opacity: 0.8; transform: scale(1) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0.5) rotate(360deg); }
+        }
+
+        /* ===== MENU STYLES ===== */
+        .menu-tab {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            border: none;
+            padding: var(--space-sm);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 18px;
+            flex: 1;
+            transition: background var(--transition-fast) var(--ease-out);
+        }
+
+        .menu-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .menu-tab.active {
+            background: var(--color-button);
+            color: white;
+            font-weight: bold;
+        }
+
+        .menu-tab-content {
+            display: none;
+            width: 100%;
+        }
+
+        .menu-tab-content.active {
+            display: block;
+            width: 100%;
+        }
+
+        /* ===== TUTORIAL STYLES ===== */
+        .tutorial-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, var(--color-ui), rgba(210, 180, 140, 0.95));
+            border-top: 4px solid var(--color-button);
+            padding: var(--space-md);
+            display: none;
+            flex-direction: column;
+            gap: var(--space-md);
+            z-index: 500;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tutorial-panel.active {
+            display: flex;
+        }
+
+        .tutorial-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .tutorial-message {
+            font-size: 28px;
+            text-align: center;
+            color: var(--color-text);
+            font-weight: bold;
+            line-height: 1.4;
+            max-width: 600px;
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+        }
+
+        .tutorial-button {
+            background: var(--color-button);
+            color: white;
+            border: none;
+            padding: var(--space-sm);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 24px;
+            min-width: 160px;
+            min-height: 64px;
+            transition: background var(--transition-fast) var(--ease-out);
+        }
+
+        .tutorial-button:hover {
+            background: var(--color-button-hover);
+        }
+
+        .tutorial-button:active {
+            transform: scale(0.95);
+        }
+
+        .tutorial-skip {
+            background: #888;
+        }
+
+        .tutorial-skip:hover {
+            background: #666;
+        }
+
+        /* Highlight overlay for tutorial targets */
+        .tutorial-highlight {
+            position: absolute;
+            border: 4px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.3);
+            pointer-events: none;
+            animation: tutorialPulse 1s ease-in-out infinite;
+            z-index: 400;
+        }
+
+        @keyframes tutorialPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 1), inset 0 0 30px rgba(255, 215, 0, 0.5); }
+        }
+
+        /* Dim overlay for non-target areas */
+        .tutorial-dim {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 350;
+        }
+
+        /* ===== RANGE INPUT STYLING ===== */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, #4CAF50 0%, #4CAF50 70%, #ddd 70%, #ddd 100%);
+            outline: none;
+            -webkit-slider-thumb-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-button);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: background 150ms ease-out;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--color-button-hover);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(0.95);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-button);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: background 150ms ease-out;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: var(--color-button-hover);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: transparent;
+            border: none;
+        }
+
+        input[type="range"]::-moz-range-progress {
+            background: #4CAF50;
+            height: 12px;
+            border-radius: 6px;
+        }
+
+        /* ===== CHECKBOX STYLING ===== */
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            background: white;
+            border: 3px solid var(--color-button);
+            border-radius: 6px;
+            position: relative;
+            transition: all 150ms ease-out;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:hover {
+            background: #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        input[type="checkbox"]:active {
+            transform: scale(0.95);
+        }
+
+        input[type="checkbox"]:checked {
+            background: #4CAF50;
+            border-color: #2E7D32;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        input[type="checkbox"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        input[type="checkbox"]:focus {
+            outline: 2px solid #FFD700;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: var(--space-md); flex: 1;">
+            <div class="coin-display">
+                <img id="coinIcon" class="coin-icon" alt="Coins">
+                <span id="coinCount">0</span>
+            </div>
+            <div id="powerupsContainer" class="powerups-container"></div>
+        </div>
+        <button id="expandButton" class="expand-button">
+            <img id="expandIcon" class="expand-icon" alt="Expand">
+            <span id="expandCost">Expand</span>
+        </button>
+    </div>
+
+    <!-- Main Game Area -->
+    <div class="main">
+        <canvas id="farmCanvas"></canvas>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <button id="shopButton" class="ui-button">
+            <img id="shopIcon" class="ui-icon" alt="Shop">
+            <span>Shop</span>
+        </button>
+        <button id="expandButtonFooter" class="expand-button">
+            <img id="expandIconFooter" class="expand-icon" alt="Expand">
+            <span id="expandCostFooter">Expand</span>
+        </button>
+        <button id="inventoryButton" class="ui-button">
+            <img id="inventoryIcon" class="ui-icon" alt="Inventory">
+            <span>Inventory</span>
+        </button>
+        <button id="menuButton" class="ui-button" style="position: fixed; top: 16px; right: 16px; z-index: 999;">
+            <img id="menuIcon" class="ui-icon" alt="Menu">
+            <span>Menu</span>
+        </button>
+    </div>
+
+    <!-- Shop Overlay -->
+    <div id="shopOverlay" class="overlay">
+        <div class="panel">
+            <div class="panel-header">
+                <span>Seed Shop</span>
+                <button id="closeShop" class="close-button">Close</button>
+            </div>
+            <div id="shopGridContainer" class="grid-container">
+                <div id="shopGrid" class="shop-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Overlay -->
+    <div id="inventoryOverlay" class="overlay">
+        <div class="panel">
+            <div class="panel-header">
+                <span>Inventory</span>
+                <button id="closeInventory" class="close-button">Close</button>
+            </div>
+            <div id="inventoryGridContainer" class="grid-container">
+                <div id="inventoryGrid" class="inventory-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div id="menuOverlay" class="overlay">
+        <div class="panel" style="max-width: 600px; max-height: 90%;">
+            <div class="panel-header">
+                <span>Menu</span>
+                <button id="closeMenu" class="close-button">Close</button>
+            </div>
+            
+            <!-- Menu Tabs -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-shrink: 0; border-bottom: 2px solid var(--color-button);">
+                <button id="menuTabSettings" class="menu-tab active" data-tab="settings" style="display: flex; align-items: center; gap: 8px;"><img id="settingsTabIcon" class="ui-icon" alt="Settings" style="width: 20px; height: 20px;"> Settings</button>
+                <button id="menuTabControls" class="menu-tab" data-tab="controls" style="display: flex; align-items: center; gap: 8px;"><img id="controlsTabIcon" class="ui-icon" alt="Controls" style="width: 20px; height: 20px;"> Controls</button>
+                <button id="menuTabAbout" class="menu-tab" data-tab="about" style="display: flex; align-items: center; gap: 8px;"><img id="aboutTabIcon" class="ui-icon" alt="About" style="width: 20px; height: 20px;"> About</button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div id="menuContent" class="grid-container">
+                
+                <!-- Settings Tab -->
+                <div id="menuSettings" class="menu-tab-content active">
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        
+                        <!-- Music Volume -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="musicVolumeIcon" class="ui-icon" alt="Music Volume" style="width: 24px; height: 24px;"> Music Volume</label>
+                            <input type="range" id="musicVolume" min="0" max="100" value="70" style="width: 100%; height: 12px; cursor: pointer; -webkit-appearance: slider-horizontal; appearance: slider-horizontal;">
+                            <span id="musicVolumeValue" style="font-size: 16px; color: #FF9800;">70%</span>
+                        </div>
+                        
+                        <!-- SFX Volume -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="sfxVolumeIcon" class="ui-icon" alt="SFX Volume" style="width: 24px; height: 24px;"> Sound Effects Volume</label>
+                            <input type="range" id="sfxVolume" min="0" max="100" value="70" style="width: 100%; height: 12px; cursor: pointer; -webkit-appearance: slider-horizontal; appearance: slider-horizontal;">
+                            <span id="sfxVolumeValue" style="font-size: 16px; color: #FF9800;">70%</span>
+                        </div>
+                        
+                        <!-- Music Toggle -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="musicEnabledIcon" class="ui-icon" alt="Music Enabled" style="width: 24px; height: 24px;"> Enable Music</label>
+                            <input type="checkbox" id="musicEnabled" checked>
+                        </div>
+                        
+                        <!-- SFX Toggle -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="sfxEnabledIcon" class="ui-icon" alt="SFX Enabled" style="width: 24px; height: 24px;"> Enable Sound Effects</label>
+                            <input type="checkbox" id="sfxEnabled" checked>
+                        </div>
+                        
+                        <!-- Fullscreen Toggle -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="fullscreenIcon" class="ui-icon" alt="Fullscreen" style="width: 24px; height: 24px;"> Fullscreen</label>
+                            <input type="checkbox" id="fullscreenEnabled">
+                        </div>
+                        
+                        <!-- UI Scale Toggle -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="largeUIIcon" class="ui-icon" alt="Large UI" style="width: 24px; height: 24px;"> Large UI</label>
+                            <input type="checkbox" id="largeUIEnabled">
+                        </div>
+                        
+                        <!-- Animations Toggle -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <label style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;"><img id="animationsIcon" class="ui-icon" alt="Animations" style="width: 24px; height: 24px;"> Enable Animations</label>
+                            <input type="checkbox" id="animationsEnabled" checked>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Controls Tab -->
+                <div id="menuControls" class="menu-tab-content">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsMouseIcon" alt="Mouse">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Left Click on Empty Tile</div>
+                                <div style="font-size: 14px; color: #666;">Plant a seed (if selected)</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsHarvestIcon" alt="Harvest">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Left Click on Ready Plant</div>
+                                <div style="font-size: 14px; color: #666;">Harvest the crop and earn coins</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsInventoryIcon" alt="Inventory">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Click Seed in Inventory</div>
+                                <div style="font-size: 14px; color: #666;">Select seed type for planting</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsTimerIcon" alt="Timer">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Hover/Click Growing Plant</div>
+                                <div style="font-size: 14px; color: #666;">View time remaining until harvest</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsExpandIcon" alt="Expand">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Click Expand Button</div>
+                                <div style="font-size: 14px; color: #666;">Unlock next ring of farmland</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsShopIcon" alt="Shop">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Click Shop Button</div>
+                                <div style="font-size: 14px; color: #666;">Buy seeds with coins</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                            <img style="font-size: 32px; min-width: 40px; width: 40px; height: 40px; image-rendering: pixelated;" id="controlsPowerupIcon" alt="Powerup">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold;">Click Power-up Icon</div>
+                                <div style="font-size: 14px; color: #666;">Watch ad to activate temporary boost</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Keyboard Shortcuts Section -->
+                        <div style="border-top: 2px solid var(--color-button); padding-top: 24px; margin-top: 24px;">
+                            <div style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">⌨️ Keyboard Shortcuts</div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                
+                                <!-- Menu Shortcut -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: bold;">Menu</div>
+                                        <div style="font-size: 14px; color: #666;">Open/Close Menu</div>
+                                    </div>
+                                    <button id="controlsRemapMenu" class="tutorial-button" data-remap="menu" style="min-width: 140px; min-height: 48px; font-size: 16px; background: var(--color-button);">Change Key</button>
+                                </div>
+                                
+                                <!-- Inventory Shortcut -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: bold;">Inventory</div>
+                                        <div style="font-size: 14px; color: #666;">Open/Close Inventory</div>
+                                    </div>
+                                    <button id="controlsRemapInventory" class="tutorial-button" data-remap="inventory" style="min-width: 140px; min-height: 48px; font-size: 16px; background: var(--color-button);">Change Key</button>
+                                </div>
+                                
+                                <!-- Shop Shortcut -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: bold;">Shop</div>
+                                        <div style="font-size: 14px; color: #666;">Open/Close Shop</div>
+                                    </div>
+                                    <button id="controlsRemapShop" class="tutorial-button" data-remap="shop" style="min-width: 140px; min-height: 48px; font-size: 16px; background: var(--color-button);">Change Key</button>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- About Tab -->
+                <div id="menuAbout" class="menu-tab-content">
+                    <div style="display: flex; flex-direction: column; gap: 0; text-align: center; align-items: center; justify-content: center; height: 100%; padding: 32px;">
+                        <div style="font-size: 28px; line-height: 1.6; font-weight: bold; margin-bottom: 24px;">Pixel Farm Tycoon</div>
+                        <div style="font-size: 20px; line-height: 1.8;">
+                            <div style="margin-bottom: 16px;">Created by Duduhlobo</div>
+                            <div style="margin-bottom: 16px;">Version v0.1.0</div>
+                            <div style="margin-bottom: 24px; color: #666;">A pixel-art farming game made with HTML5 and JavaScript.</div>
+                            <div style="font-size: 24px; margin-top: 24px;">Thanks for playing 🌱</div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Panel -->
+    <div id="tutorialPanel" class="tutorial-panel">
+        <div class="tutorial-content">
+            <div id="tutorialMessage" class="tutorial-message"></div>
+            <div class="tutorial-buttons">
+                <button id="tutorialSkip" class="tutorial-button tutorial-skip">Skip Tutorial</button>
+                <button id="tutorialNext" class="tutorial-button tutorial-next" style="display: none;">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==================================================
+         * GAME OVERVIEW: Pixel Farm Tycoon - A grid-based farming idle game where players plant seeds,
+         * harvest crops, and expand their farm in concentric rings. No character movement - all 
+         * interaction via mouse/touch on tiles. Features complete inventory system, seed purchasing,
+         * and strategic expansion using Chebyshev distance.
+         * 
+         * GAME STATE SHAPE: window.gameConfig = {
+         *   crops: [{ id, name, growthTime, seedCost, harvestValue, sprites: {seed, growing, ready} }],
+         *   economy: { startingCoins, ringCosts: [], startingSeeds: {} },
+         *   visual: { gridSize, tileSize, backgroundColor }
+         * }
+         * ==================================================
+         */
+
+        // ===== LAYOUT MANAGER =====
+        // Adaptive layout system that detects and responds to:
+        // - Device type (mobile, tablet, desktop)
+        // - Screen orientation (portrait, landscape)
+        // - Screen resolution and DPI
+        // - Safe areas (notches, rounded corners)
+        // Updates UI in real-time without reloading the scene
+        const LayoutManager = {
+            currentLayout: 'portrait', // 'portrait', 'landscape', 'desktop', 'tablet'
+            lastLayout: 'portrait',
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            dpi: 96,
+            safeArea: { top: 0, left: 0, right: 0, bottom: 0 },
+            deviceType: 'mobile', // 'mobile', 'tablet', 'desktop'
+            
+            // Detect DPI
+            detectDPI() {
+                // Use CSS pixel ratio for accurate DPI detection
+                const dpi = window.devicePixelRatio || 1;
+                this.dpi = dpi * 96; // Convert to actual DPI
+                return this.dpi;
+            },
+            
+            // Detect safe area (notch, rounded corners, etc.)
+            detectSafeArea() {
+                if (window.visualViewport) {
+                    this.safeArea = {
+                        top: window.visualViewport.offsetTop || 0,
+                        left: window.visualViewport.offsetLeft || 0,
+                        right: window.innerWidth - (window.visualViewport.offsetLeft + window.visualViewport.width),
+                        bottom: window.innerHeight - (window.visualViewport.offsetTop + window.visualViewport.height)
+                    };
+                } else {
+                    // Fallback for browsers without visualViewport
+                    this.safeArea = { top: 0, left: 0, right: 0, bottom: 0 };
+                }
+                return this.safeArea;
+            },
+            
+            // Detect device type
+            detectDeviceType() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const minDimension = Math.min(width, height);
+                
+                if (width >= 1025) {
+                    return 'desktop';
+                } else if (minDimension >= 600) {
+                    return 'tablet';
+                } else {
+                    return 'mobile';
+                }
+            },
+            
+            // Detect layout based on orientation and device
+            detectLayout() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const isPortrait = height > width;
+                const deviceType = this.detectDeviceType();
+                
+                if (deviceType === 'desktop') {
+                    return 'desktop';
+                } else if (deviceType === 'tablet') {
+                    return isPortrait ? 'tablet-portrait' : 'tablet-landscape';
+                } else {
+                    return isPortrait ? 'portrait' : 'landscape';
+                }
+            },
+            
+            // Calculate font scale based on DPI
+            calculateFontScale() {
+                const baseDPI = 96;
+                return this.dpi / baseDPI;
+            },
+            
+            // Apply font scaling
+            applyFontScaling() {
+                const scale = this.calculateFontScale();
+                const root = document.documentElement;
+                
+                // Scale CSS variables
+                const baseFontSize = 24;
+                root.style.setProperty('--base-font-size', (baseFontSize * scale) + 'px');
+                
+                // Apply to body
+                document.body.style.fontSize = (baseFontSize * scale) + 'px';
+            },
+            
+            // Apply safe area margins
+            applySafeArea() {
+                const header = document.querySelector('.header');
+                const footer = document.querySelector('.footer');
+                const main = document.querySelector('.main');
+                
+                if (header) {
+                    header.style.paddingTop = (16 + this.safeArea.top) + 'px';
+                    header.style.paddingLeft = (16 + this.safeArea.left) + 'px';
+                    header.style.paddingRight = (16 + this.safeArea.right) + 'px';
+                }
+                
+                if (footer) {
+                    footer.style.paddingBottom = (16 + this.safeArea.bottom) + 'px';
+                    footer.style.paddingLeft = (16 + this.safeArea.left) + 'px';
+                    footer.style.paddingRight = (16 + this.safeArea.right) + 'px';
+                }
+                
+                if (main) {
+                    main.style.marginLeft = this.safeArea.left + 'px';
+                    main.style.marginRight = this.safeArea.right + 'px';
+                }
+            },
+            
+            // Update layout
+            updateLayout() {
+                this.lastLayout = this.currentLayout;
+                this.screenWidth = window.innerWidth;
+                this.screenHeight = window.innerHeight;
+                
+                this.detectDPI();
+                this.detectSafeArea();
+                this.deviceType = this.detectDeviceType();
+                
+                const newLayout = this.detectLayout();
+                
+                if (newLayout !== this.currentLayout) {
+                    this.currentLayout = newLayout;
+                    this.applyLayout();
+                    return true;
+                }
+                return false;
+            },
+            
+            // Apply layout changes
+            applyLayout() {
+                const body = document.body;
+                body.dataset.layout = this.currentLayout;
+                body.dataset.device = this.deviceType;
+                
+                // Apply font scaling
+                this.applyFontScaling();
+                
+                // Apply safe area
+                this.applySafeArea();
+                
+                // Recalculate canvas size
+                if (canvas) {
+                    setupCanvas();
+                }
+                
+                // Update UI elements
+                this.updateUIElements();
+                
+                // Ensure no overflow
+                this.ensureNoOverflow();
+                
+                // Trigger render
+                if (ctx) {
+                    render();
+                }
+            },
+            
+            // Update UI elements based on layout
+            updateUIElements() {
+                const header = document.querySelector('.header');
+                const footer = document.querySelector('.footer');
+                const powerupsContainer = document.getElementById('powerupsContainer');
+                
+                if (!header || !footer) return;
+                
+                // Adjust flex direction and wrapping based on layout
+                if (this.currentLayout === 'landscape' || this.currentLayout === 'tablet-landscape') {
+                    header.style.flexWrap = 'nowrap';
+                    header.style.gap = '8px';
+                    footer.style.flexDirection = 'column';
+                    footer.style.gap = '8px';
+                } else {
+                    header.style.flexWrap = 'wrap';
+                    header.style.gap = '16px';
+                    footer.style.flexDirection = 'row';
+                    footer.style.gap = '16px';
+                }
+                
+                // Adjust powerups container
+                if (powerupsContainer) {
+                    if (this.currentLayout === 'landscape' || this.currentLayout === 'tablet-landscape') {
+                        powerupsContainer.style.flexWrap = 'nowrap';
+                        powerupsContainer.style.overflowX = 'auto';
+                    } else {
+                        powerupsContainer.style.flexWrap = 'wrap';
+                        powerupsContainer.style.overflowX = 'visible';
+                    }
+                }
+                
+                // Ensure no elements overflow
+                this.ensureNoOverflow();
+            },
+            
+            // Ensure no UI elements overflow the viewport
+            ensureNoOverflow() {
+                const elements = document.querySelectorAll('.header, .footer, .main, .panel');
+                
+                elements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    
+                    // Check if element overflows horizontally
+                    if (rect.right > window.innerWidth) {
+                        const overflow = rect.right - window.innerWidth;
+                        el.style.marginRight = (-overflow - 8) + 'px';
+                    }
+                    
+                    // Check if element overflows vertically
+                    if (rect.bottom > window.innerHeight) {
+                        const overflow = rect.bottom - window.innerHeight;
+                        el.style.marginBottom = (-overflow - 8) + 'px';
+                    }
+                });
+            },
+            
+            // Save layout preference
+            saveLayoutPreference() {
+                try {
+                    // Use gameConfig to persist (since localStorage is not available)
+                    if (window.gameConfig) {
+                        window.gameConfig.lastLayout = this.currentLayout;
+                    }
+                } catch (e) {
+                    lib.log('Could not save layout preference: ' + e);
+                }
+            },
+            
+            // Load layout preference
+            loadLayoutPreference() {
+                try {
+                    if (window.gameConfig && window.gameConfig.lastLayout) {
+                        return window.gameConfig.lastLayout;
+                    }
+                } catch (e) {
+                    lib.log('Could not load layout preference: ' + e);
+                }
+                return null;
+            }
+        };
+
+        // ===== KEYBOARD BINDINGS MANAGER =====
+        const KeyBindingsManager = {
+            keyBindings: {
+                menu: 'Escape',
+                inventory: 'KeyE',
+                shop: 'KeyQ'
+            },
+            isRemapping: false,
+            remappingKey: null,
+            
+            // Load key bindings from gameConfig
+            loadBindings() {
+                try {
+                    if (window.gameConfig && window.gameConfig.keyBindings) {
+                        this.keyBindings = { ...this.keyBindings, ...window.gameConfig.keyBindings };
+                        console.log('KeyBindingsManager: Loaded bindings from gameConfig');
+                    }
+                } catch (e) {
+                    lib.log('KeyBindingsManager: Could not load bindings: ' + e);
+                }
+            },
+            
+            // Save key bindings to gameConfig
+            saveBindings() {
+                try {
+                    if (!window.gameConfig) window.gameConfig = {};
+                    window.gameConfig.keyBindings = { ...this.keyBindings };
+                    console.log('KeyBindingsManager: Saved bindings to gameConfig');
+                } catch (e) {
+                    lib.log('KeyBindingsManager: Could not save bindings: ' + e);
+                }
+            },
+            
+            // Get display name for key code
+            getKeyDisplayName(keyCode) {
+                const keyMap = {
+                    'Escape': 'ESC',
+                    'KeyE': 'E',
+                    'KeyQ': 'Q',
+                    'KeyW': 'W',
+                    'KeyA': 'A',
+                    'KeyS': 'S',
+                    'KeyD': 'D',
+                    'KeyR': 'R',
+                    'KeyT': 'T',
+                    'KeyY': 'Y',
+                    'KeyU': 'U',
+                    'KeyI': 'I',
+                    'KeyO': 'O',
+                    'KeyP': 'P',
+                    'KeyF': 'F',
+                    'KeyG': 'G',
+                    'KeyH': 'H',
+                    'KeyJ': 'J',
+                    'KeyK': 'K',
+                    'KeyL': 'L',
+                    'KeyZ': 'Z',
+                    'KeyX': 'X',
+                    'KeyC': 'C',
+                    'KeyV': 'V',
+                    'KeyB': 'B',
+                    'KeyN': 'N',
+                    'KeyM': 'M',
+                    'Space': 'SPACE',
+                    'Enter': 'ENTER',
+                    'Tab': 'TAB',
+                    'ShiftLeft': 'SHIFT',
+                    'ControlLeft': 'CTRL',
+                    'AltLeft': 'ALT'
+                };
+                return keyMap[keyCode] || keyCode;
+            },
+            
+            // Start remapping a key
+            startRemapping(action) {
+                this.isRemapping = true;
+                this.remappingKey = action;
+                
+                // Highlight Settings tab button
+                const btn = document.querySelector(`[data-remap="${action}"]`);
+                if (btn) {
+                    btn.textContent = 'Press any key...';
+                    btn.style.background = '#FFD700';
+                    btn.style.color = '#333';
+                }
+                
+                // Highlight Controls tab button
+                const controlsBtn = document.getElementById(`controlsRemap${action.charAt(0).toUpperCase() + action.slice(1)}`);
+                if (controlsBtn) {
+                    controlsBtn.textContent = 'Press any key...';
+                    controlsBtn.style.background = '#FFD700';
+                    controlsBtn.style.color = '#333';
+                }
+            },
+            
+            // Stop remapping
+            stopRemapping() {
+                if (this.remappingKey) {
+                    // Update Settings tab button
+                    const btn = document.querySelector(`[data-remap="${this.remappingKey}"]`);
+                    if (btn) {
+                        btn.textContent = `Change Key (${this.getKeyDisplayName(this.keyBindings[this.remappingKey])})`;
+                        btn.style.background = '';
+                        btn.style.color = '';
+                    }
+                    
+                    // Update Controls tab button
+                    const controlsBtn = document.getElementById(`controlsRemap${this.remappingKey.charAt(0).toUpperCase() + this.remappingKey.slice(1)}`);
+                    if (controlsBtn) {
+                        controlsBtn.textContent = `Change Key (${this.getKeyDisplayName(this.keyBindings[this.remappingKey])})`;
+                        controlsBtn.style.background = '';
+                        controlsBtn.style.color = '';
+                    }
+                }
+                
+                this.isRemapping = false;
+                this.remappingKey = null;
+            },
+            
+            // Handle key press during remapping
+            handleRemappingKeyPress(event) {
+                if (!this.isRemapping || !this.remappingKey) return;
+                
+                event.preventDefault();
+                
+                const newKeyCode = event.code;
+                
+                // Prevent remapping to Escape if it's the menu key
+                if (newKeyCode === 'Escape' && this.remappingKey !== 'menu') {
+                    if (audioManager) audioManager.playSfx('error_sound');
+                    return;
+                }
+                
+                // Update binding
+                this.keyBindings[this.remappingKey] = newKeyCode;
+                this.saveBindings();
+                
+                // Update Settings tab button
+                const btn = document.querySelector(`[data-remap="${this.remappingKey}"]`);
+                if (btn) {
+                    btn.textContent = `Change Key (${this.getKeyDisplayName(newKeyCode)})`;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+                
+                // Update Controls tab button
+                const controlsBtn = document.getElementById(`controlsRemap${this.remappingKey.charAt(0).toUpperCase() + this.remappingKey.slice(1)}`);
+                if (controlsBtn) {
+                    controlsBtn.textContent = `Change Key (${this.getKeyDisplayName(newKeyCode)})`;
+                    controlsBtn.style.background = '';
+                    controlsBtn.style.color = '';
+                }
+                
+                this.isRemapping = false;
+                this.remappingKey = null;
+                
+                if (audioManager) audioManager.playSfx('purchase_sound');
+            }
+        };
+
+        // ===== MENU MANAGER =====
+        const MenuManager = {
+            isOpen: false,
+            isPaused: false,
+            settings: {
+                musicVolume: 70,
+                sfxVolume: 70,
+                musicEnabled: true,
+                sfxEnabled: true,
+                fullscreenEnabled: false,
+                largeUIEnabled: false,
+                animationsEnabled: true
+            },
+            
+            // Load settings from gameConfig
+            loadSettings() {
+                if (window.gameConfig && window.gameConfig.menuSettings) {
+                    this.settings = { ...this.settings, ...window.gameConfig.menuSettings };
+                }
+                this.applySettings();
+            },
+            
+            // Save settings to gameConfig
+            saveSettings() {
+                if (!window.gameConfig) window.gameConfig = {};
+                window.gameConfig.menuSettings = { ...this.settings };
+            },
+            
+            // Apply settings to UI and game
+            applySettings() {
+                // Update UI elements
+                document.getElementById('musicVolume').value = this.settings.musicVolume;
+                document.getElementById('musicVolumeValue').textContent = this.settings.musicVolume + '%';
+                document.getElementById('sfxVolume').value = this.settings.sfxVolume;
+                document.getElementById('sfxVolumeValue').textContent = this.settings.sfxVolume + '%';
+                document.getElementById('musicEnabled').checked = this.settings.musicEnabled;
+                document.getElementById('sfxEnabled').checked = this.settings.sfxEnabled;
+                document.getElementById('fullscreenEnabled').checked = this.settings.fullscreenEnabled;
+                document.getElementById('largeUIEnabled').checked = this.settings.largeUIEnabled;
+                document.getElementById('animationsEnabled').checked = this.settings.animationsEnabled;
+                
+                // Apply animations setting
+                if (!this.settings.animationsEnabled) {
+                    document.body.style.setProperty('--transition-fast', '0ms');
+                    document.body.style.setProperty('--transition-normal', '0ms');
+                    document.body.style.setProperty('--transition-slow', '0ms');
+                } else {
+                    document.body.style.setProperty('--transition-fast', '150ms');
+                    document.body.style.setProperty('--transition-normal', '300ms');
+                    document.body.style.setProperty('--transition-slow', '500ms');
+                }
+                
+                // Apply large UI setting
+                if (this.settings.largeUIEnabled) {
+                    document.body.style.fontSize = '32px';
+                } else {
+                    document.body.style.fontSize = '24px';
+                }
+            },
+            
+            // Open menu
+            openMenu() {
+                if (this.isOpen) return;
+                
+                this.isOpen = true;
+                this.isPaused = true;
+                
+                const overlay = document.getElementById('menuOverlay');
+                overlay.classList.add('active');
+                
+                // Pause game loop
+                lastTime = performance.now();
+                
+                if (audioManager) audioManager.playSfx('purchase_sound');
+            },
+            
+            // Close menu
+            closeMenu() {
+                if (!this.isOpen) return;
+                
+                this.isOpen = false;
+                this.isPaused = false;
+                
+                const overlay = document.getElementById('menuOverlay');
+                overlay.classList.remove('active');
+                
+                // Resume game loop
+                lastTime = performance.now();
+                
+                if (audioManager) audioManager.playSfx('purchase_sound');
+            },
+            
+            // Toggle menu
+            toggleMenu() {
+                if (this.isOpen) {
+                    this.closeMenu();
+                } else {
+                    this.openMenu();
+                }
+            },
+            
+            // Switch tab
+            switchTab(tabName) {
+                // Hide all tabs
+                document.querySelectorAll('.menu-tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Remove active class from all buttons
+                document.querySelectorAll('.menu-tab').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Show selected tab
+                const tabContent = document.getElementById('menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+                
+                // Mark button as active
+                const tabButton = document.querySelector(`[data-tab="${tabName}"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+            }
+        };
+
+        // ===== GLOBAL STATE =====
+        let currentMode = 'play';
+        let canvas, ctx;
+        let audioContext;
+        let audioManager; // AudioManager instance
+        let assetCache = {};
+        let audioBuffers = {};
+        
+        // Runtime game state (not in gameConfig)
+        let coins = 0;
+        let inventory = {}; // { itemId: { id, name, type, quantity, value } }
+        let tiles = {}; // { "x,y": { x, y, state, cropId, plantedTime } }
+        let currentRing = 0;
+        let selectedCropId = null;
+        let lastTime = 0;
+        let particles = [];
+        let hoveredTile = null; // { x, y } or null
+        let selectedTile = null; // { x, y } or null
+        
+        // Power-ups state
+        let activePowerups = {}; // { powerupId: { startTime, duration, cooldownStartTime, cooldown } }
+        
+        // Tutorial state
+        let tutorialStep = 0;
+        let tutorialCompleted = false;
+        let tutorialTileTarget = null; // { x, y } for current step target
+        let tutorialHovered = false;
+        let tutorialClicked = false;
+
+        // ===== ASSET LOADING =====
+        function preloadAssets() {
+            const assetIds = [
+                'soil_tile', 'dirt_tile_01', 'dirt_tile_02', 'dirt_tile_03', 'dirt_tile_04', 'locked_tile', 'lock_overlay',
+                'carrot_seed', 'carrot_growing', 'carrot_ready',
+                'wheat_seed', 'wheat_growing', 'wheat_ready',
+                'tomato_seed', 'tomato_growing', 'tomato_ready',
+                'potato_seed', 'potato_growing', 'potato_ready',
+                'corn_seed', 'corn_growing', 'corn_ready',
+                'pumpkin_seed', 'pumpkin_growing', 'pumpkin_ready',
+                'seed_lettuce', 'lettuce_stage1', 'lettuce_stage2', 'lettuce_ready',
+                'seed_eggplant', 'eggplant_stage1', 'eggplant_stage2', 'eggplant_ready',
+                'seed_sunflower', 'sunflower_stage1', 'sunflower_stage2', 'sunflower_ready',
+                'seed_radish', 'radish_stage1', 'radish_stage2', 'radish_ready',
+                'coin_icon', 'shop_icon', 'inventory_icon', 'expand_icon', 'settings_gear_icon',
+                'menu_icon_controls', 'menu_icon_about',
+                'icon_music_volume', 'icon_sfx_volume', 'icon_music_enabled', 'icon_sfx_enabled',
+                'icon_fullscreen', 'icon_large_ui', 'icon_animations',
+                'icon_harvest', 'icon_inventory_select', 'icon_expand_farm', 'icon_shop_button',
+                'harvest_sound', 'plant_sound', 'purchase_sound', 
+                'unlock_sound', 'error_sound', 'background_music'
+            ];
+
+            let loadedCount = 0;
+            const totalAssets = assetIds.length;
+
+            return Promise.all(assetIds.map(id => {
+                return new Promise((resolve) => {
+                    const assetInfo = lib.getAsset(id);
+                    if (!assetInfo) {
+                        lib.log(`Asset ${id} not found`);
+                        resolve();
+                        return;
+                    }
+
+                    if (assetInfo.type === 'audio') {
+                        fetch(assetInfo.url)
+                            .then(response => response.arrayBuffer())
+                            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                            .then(audioBuffer => {
+                                audioBuffers[id] = audioBuffer;
+                                loadedCount++;
+                                resolve();
+                            })
+                            .catch(err => {
+                                lib.log(`Error loading audio ${id}: ${err}`);
+                                resolve();
+                            });
+                    } else {
+                        const img = new Image();
+                        img.onload = () => {
+                            assetCache[id] = img;
+                            loadedCount++;
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            lib.log(`Error loading image ${id}`);
+                            resolve();
+                        };
+                        img.src = assetInfo.url;
+                    }
+                });
+            }));
+        }
+
+        // ===== AUDIO FUNCTIONS =====
+        function resumeAudioContext() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().catch(err => {
+                    lib.log('Failed to resume audio context: ' + err);
+                });
+            }
+        }
+
+        function playSound(soundId) {
+            if (!audioContext) {
+                lib.log('Audio context not initialized');
+                return;
+            }
+            
+            // Resume audio context if suspended
+            resumeAudioContext();
+            
+            if (!audioBuffers[soundId]) {
+                lib.log('Sound buffer not found: ' + soundId);
+                return;
+            }
+            
+            try {
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffers[soundId];
+                
+                // Create gain node for volume control
+                const gainNode = audioContext.createGain();
+                
+                // Calculate volume: check if SFX is enabled, then apply volume percentage
+                const volumePercent = MenuManager.settings.sfxVolume || 70;
+                const isEnabled = MenuManager.settings.sfxEnabled !== false; // Default to true if undefined
+                const finalVolume = isEnabled ? (volumePercent / 100) : 0;
+                
+                gainNode.gain.value = Math.max(0, Math.min(1, finalVolume)); // Clamp between 0 and 1
+                
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                source.start(0);
+            } catch (err) {
+                lib.log('Error playing sound ' + soundId + ': ' + err);
+            }
+        }
+
+        function playBackgroundMusic() {
+            if (!audioContext) {
+                lib.log('Audio context not initialized');
+                return;
+            }
+            
+            // Resume audio context if suspended
+            resumeAudioContext();
+            
+            if (!audioBuffers['background_music']) {
+                lib.log('Background music buffer not found');
+                return;
+            }
+            
+            try {
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffers['background_music'];
+                source.loop = true;
+                
+                // Create gain node for volume control
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = MenuManager.settings.musicEnabled ? (MenuManager.settings.musicVolume / 100) : 0;
+                
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                source.start(0);
+            } catch (err) {
+                lib.log('Error playing background music: ' + err);
+            }
+        }
+
+        // ===== AUDIO MANAGER CLASS =====
+        class AudioManager {
+            constructor(audioCtx) {
+                this.audioContext = audioCtx;
+                this.bgm = null;
+                this.bgmSource = null;
+                this.bgmGainNode = null;
+                this.sfxSources = []; // Track active SFX sources
+                
+                // Audio settings
+                this.musicVolume = 70;
+                this.sfxVolume = 70;
+                this.musicEnabled = true;
+                this.sfxEnabled = true;
+                
+                // Load settings from persistence
+                this.loadSettings();
+            }
+            
+            // ===== PERSISTENCE =====
+            loadSettings() {
+                try {
+                    // Try to load from gameConfig first
+                    if (window.gameConfig && window.gameConfig.audioSettings) {
+                        const settings = window.gameConfig.audioSettings;
+                        this.musicVolume = settings.musicVolume !== undefined ? settings.musicVolume : 70;
+                        this.sfxVolume = settings.sfxVolume !== undefined ? settings.sfxVolume : 70;
+                        this.musicEnabled = settings.musicEnabled !== undefined ? settings.musicEnabled : true;
+                        this.sfxEnabled = settings.sfxEnabled !== undefined ? settings.sfxEnabled : true;
+                        console.log('AudioManager: Loaded settings from gameConfig');
+                    }
+                } catch (e) {
+                    lib.log('AudioManager: Could not load settings: ' + e);
+                }
+            }
+            
+            saveSettings() {
+                try {
+                    if (!window.gameConfig) window.gameConfig = {};
+                    window.gameConfig.audioSettings = {
+                        musicVolume: this.musicVolume,
+                        sfxVolume: this.sfxVolume,
+                        musicEnabled: this.musicEnabled,
+                        sfxEnabled: this.sfxEnabled
+                    };
+                    console.log('AudioManager: Saved settings to gameConfig');
+                } catch (e) {
+                    lib.log('AudioManager: Could not save settings: ' + e);
+                }
+            }
+            
+            // ===== AUDIO CONTEXT MANAGEMENT =====
+            resumeContext() {
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().catch(err => {
+                        lib.log('AudioManager: Failed to resume audio context: ' + err);
+                    });
+                }
+            }
+            
+            // ===== MUSIC CONTROL =====
+            playMusic() {
+                if (!this.audioContext) {
+                    lib.log('AudioManager: Audio context not initialized');
+                    return;
+                }
+                
+                this.resumeContext();
+                
+                if (!audioBuffers['background_music']) {
+                    lib.log('AudioManager: Background music buffer not found');
+                    return;
+                }
+                
+                try {
+                    // Stop existing music if playing
+                    if (this.bgmSource) {
+                        this.bgmSource.stop();
+                    }
+                    
+                    this.bgmSource = this.audioContext.createBufferSource();
+                    this.bgmSource.buffer = audioBuffers['background_music'];
+                    this.bgmSource.loop = true;
+                    
+                    this.bgmGainNode = this.audioContext.createGain();
+                    this.updateMusicVolume();
+                    
+                    this.bgmSource.connect(this.bgmGainNode);
+                    this.bgmGainNode.connect(this.audioContext.destination);
+                    this.bgmSource.start(0);
+                    
+                    console.log('AudioManager: Music started');
+                } catch (err) {
+                    lib.log('AudioManager: Error playing music: ' + err);
+                }
+            }
+            
+            stopMusic() {
+                if (this.bgmSource) {
+                    try {
+                        this.bgmSource.stop();
+                        this.bgmSource = null;
+                        console.log('AudioManager: Music stopped');
+                    } catch (err) {
+                        lib.log('AudioManager: Error stopping music: ' + err);
+                    }
+                }
+            }
+            
+            updateMusicVolume() {
+                if (!this.bgmGainNode) return;
+                
+                const volume = this.musicEnabled ? (this.musicVolume / 100) : 0;
+                this.bgmGainNode.gain.value = Math.max(0, Math.min(1, volume));
+                console.log('AudioManager: Music Volume:', volume.toFixed(2));
+            }
+            
+            setMusicVolume(value) {
+                this.musicVolume = Math.max(0, Math.min(100, value * 100));
+                this.updateMusicVolume();
+                this.saveSettings();
+            }
+            
+            toggleMusic(state) {
+                this.musicEnabled = state;
+                this.updateMusicVolume();
+                this.saveSettings();
+                console.log('AudioManager: Music Enabled:', state);
+            }
+            
+            // ===== SFX CONTROL =====
+            playSfx(soundId) {
+                if (!this.audioContext) {
+                    lib.log('AudioManager: Audio context not initialized');
+                    return;
+                }
+                
+                if (!this.sfxEnabled) {
+                    return;
+                }
+                
+                this.resumeContext();
+                
+                if (!audioBuffers[soundId]) {
+                    lib.log('AudioManager: Sound buffer not found: ' + soundId);
+                    return;
+                }
+                
+                try {
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = audioBuffers[soundId];
+                    
+                    const gainNode = this.audioContext.createGain();
+                    const volume = this.sfxVolume / 100;
+                    gainNode.gain.value = Math.max(0, Math.min(1, volume));
+                    
+                    source.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    source.start(0);
+                    
+                    // Track source for cleanup
+                    this.sfxSources.push(source);
+                    
+                    // Remove from tracking when finished
+                    source.onended = () => {
+                        const index = this.sfxSources.indexOf(source);
+                        if (index > -1) {
+                            this.sfxSources.splice(index, 1);
+                        }
+                    };
+                    
+                    console.log('AudioManager: Playing SFX:', soundId);
+                } catch (err) {
+                    lib.log('AudioManager: Error playing SFX ' + soundId + ': ' + err);
+                }
+            }
+            
+            setSfxVolume(value) {
+                this.sfxVolume = Math.max(0, Math.min(100, value * 100));
+                this.saveSettings();
+                console.log('AudioManager: SFX Volume:', this.sfxVolume);
+            }
+            
+            toggleSfx(state) {
+                this.sfxEnabled = state;
+                this.saveSettings();
+                console.log('AudioManager: SFX Enabled:', state);
+            }
+        }
+
+        // ===== INVENTORY SYSTEM =====
+        function addItem(id, name, type, quantity, value) {
+            if (!inventory[id]) {
+                inventory[id] = { id, name, type, quantity: 0, value };
+            }
+            inventory[id].quantity += quantity;
+            updateInventoryUI();
+        }
+
+        function removeItem(id, quantity) {
+            if (!inventory[id] || inventory[id].quantity < quantity) {
+                return false;
+            }
+            inventory[id].quantity -= quantity;
+            if (inventory[id].quantity === 0) {
+                delete inventory[id];
+            }
+            updateInventoryUI();
+            return true;
+        }
+
+        function hasItem(id, quantity = 1) {
+            return inventory[id] && inventory[id].quantity >= quantity;
+        }
+
+        function getQuantity(id) {
+            return inventory[id] ? inventory[id].quantity : 0;
+        }
+
+        // ===== POWER-UP FUNCTIONS =====
+        function getPowerupById(id) {
+            return window.gameConfig.powerups && window.gameConfig.powerups.find(p => p.id === id);
+        }
+
+        function isPowerupActive(powerupId) {
+            const state = activePowerups[powerupId];
+            if (!state) return false;
+            
+            const elapsed = (Date.now() - state.startTime) / 1000;
+            return elapsed < state.duration;
+        }
+
+        function isPowerupOnCooldown(powerupId) {
+            const state = activePowerups[powerupId];
+            if (!state || !state.cooldownStartTime) return false;
+            
+            const elapsed = (Date.now() - state.cooldownStartTime) / 1000;
+            return elapsed < state.cooldown;
+        }
+
+        function getPowerupTimeRemaining(powerupId) {
+            const state = activePowerups[powerupId];
+            if (!state) return 0;
+            
+            const elapsed = (Date.now() - state.startTime) / 1000;
+            return Math.max(0, state.duration - elapsed);
+        }
+
+        function getPowerupCooldownRemaining(powerupId) {
+            const state = activePowerups[powerupId];
+            if (!state || !state.cooldownStartTime) return 0;
+            
+            const elapsed = (Date.now() - state.cooldownStartTime) / 1000;
+            return Math.max(0, state.cooldown - elapsed);
+        }
+
+        function activatePowerup(powerupId) {
+            const powerup = getPowerupById(powerupId);
+            if (!powerup) return;
+            
+            // Check if already on cooldown
+            if (isPowerupOnCooldown(powerupId)) {
+                if (audioManager) audioManager.playSfx('error_sound');
+                return;
+            }
+            
+            // Activate the power-up
+            activePowerups[powerupId] = {
+                startTime: Date.now(),
+                duration: powerup.duration,
+                cooldownStartTime: null,
+                cooldown: powerup.cooldown
+            };
+            
+            if (audioManager) audioManager.playSfx('purchase_sound');
+        }
+
+        function deactivatePowerup(powerupId) {
+            const state = activePowerups[powerupId];
+            if (state) {
+                state.cooldownStartTime = Date.now();
+            }
+        }
+
+        function getGrowthMultiplier() {
+            if (isPowerupActive('growth_boost')) {
+                const powerup = getPowerupById('growth_boost');
+                return powerup.effectValue;
+            }
+            return 1;
+        }
+
+        function getHarvestMultiplier() {
+            if (isPowerupActive('money_double')) {
+                const powerup = getPowerupById('money_double');
+                return powerup.effectValue;
+            }
+            return 1;
+        }
+
+        function isAutoWaterActive() {
+            return isPowerupActive('auto_water');
+        }
+
+        function showAdSimulation(powerupId) {
+            // Simulate ad watching
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                flex-direction: column;
+                gap: 20px;
+            `;
+            
+            const adText = document.createElement('div');
+            adText.style.cssText = `
+                color: white;
+                font-size: 32px;
+                text-align: center;
+                font-family: 'VT323', monospace;
+            `;
+            adText.textContent = '📺 Watching Ad...';
+            
+            const timer = document.createElement('div');
+            timer.style.cssText = `
+                color: #FFD700;
+                font-size: 48px;
+                font-weight: bold;
+                font-family: 'VT323', monospace;
+            `;
+            timer.textContent = '3';
+            
+            overlay.appendChild(adText);
+            overlay.appendChild(timer);
+            document.body.appendChild(overlay);
+            
+            let count = 3;
+            const interval = setInterval(() => {
+                count--;
+                timer.textContent = count;
+                
+                if (count <= 0) {
+                    clearInterval(interval);
+                    overlay.remove();
+                    activatePowerup(powerupId);
+                }
+            }, 1000);
+        }
+
+        // ===== GRID FUNCTIONS =====
+        function getChebyshevDistance(x, y) {
+            return Math.max(Math.abs(x), Math.abs(y));
+        }
+
+        function getTileKey(x, y) {
+            return `${x},${y}`;
+        }
+
+        function initializeTiles() {
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            tiles = {};
+            
+            for (let x = -halfSize; x <= halfSize; x++) {
+                for (let y = -halfSize; y <= halfSize; y++) {
+                    const distance = getChebyshevDistance(x, y);
+                    const key = getTileKey(x, y);
+                    
+                    tiles[key] = {
+                        x, y,
+                        state: distance <= currentRing ? 'empty' : 'locked',
+                        cropId: null,
+                        plantedTime: 0
+                    };
+                }
+            }
+        }
+
+        function unlockRing(ring) {
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            for (let x = -halfSize; x <= halfSize; x++) {
+                for (let y = -halfSize; y <= halfSize; y++) {
+                    const distance = getChebyshevDistance(x, y);
+                    if (distance === ring) {
+                        const key = getTileKey(x, y);
+                        if (tiles[key]) {
+                            tiles[key].state = 'empty';
+                        }
+                    }
+                }
+            }
+        }
+
+        // ===== CROP FUNCTIONS =====
+        function getCropById(id) {
+            return window.gameConfig.crops.find(c => c.id === id);
+        }
+
+        function getCropGrowthStage(tile, currentTime) {
+            if (tile.state !== 'planted' && tile.state !== 'growing' && tile.state !== 'ready') {
+                return null;
+            }
+            
+            const crop = getCropById(tile.cropId);
+            if (!crop) return null;
+            
+            const elapsed = (currentTime - tile.plantedTime) / 1000; // Convert to seconds
+            const growthMultiplier = getGrowthMultiplier();
+            const adjustedGrowthTime = crop.growthTime / growthMultiplier;
+            const progress = elapsed / adjustedGrowthTime;
+            
+            if (progress >= 1) {
+                return 'ready';
+            } else if (progress >= 0.5) {
+                return 'growing';
+            } else {
+                return 'planted';
+            }
+        }
+
+        function getTimeRemaining(tile, currentTime) {
+            if (tile.state !== 'planted' && tile.state !== 'growing') {
+                return 0;
+            }
+            
+            const crop = getCropById(tile.cropId);
+            if (!crop) return 0;
+            
+            const elapsed = (currentTime - tile.plantedTime) / 1000; // Convert to seconds
+            const growthMultiplier = getGrowthMultiplier();
+            const adjustedGrowthTime = crop.growthTime / growthMultiplier;
+            const remaining = Math.max(0, adjustedGrowthTime - elapsed);
+            
+            return remaining;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateCropGrowth(currentTime) {
+            Object.values(tiles).forEach(tile => {
+                if (tile.state === 'planted' || tile.state === 'growing') {
+                    const stage = getCropGrowthStage(tile, currentTime);
+                    if (stage) {
+                        tile.state = stage;
+                    }
+                }
+            });
+        }
+
+        // ===== TUTORIAL SYSTEM =====
+        const tutorialSteps = [
+            {
+                id: 'hover_soil',
+                message: '🌾 Hover over the soil to begin!',
+                action: 'hover',
+                target: { x: 0, y: 0 },
+                condition: () => tutorialHovered
+            },
+            {
+                id: 'prepare_soil',
+                message: '🌱 Click to prepare the soil!',
+                action: 'click',
+                target: { x: 0, y: 0 },
+                condition: () => tutorialClicked
+            },
+            {
+                id: 'select_seed',
+                message: '📦 Open your inventory and click on a seed!',
+                action: 'inventory',
+                target: null,
+                condition: () => selectedCropId !== null
+            },
+            {
+                id: 'plant_seed',
+                message: '🌿 Click on the soil to plant the seed!',
+                action: 'click',
+                target: { x: 0, y: 0 },
+                condition: () => {
+                    const key = getTileKey(0, 0);
+                    return tiles[key] && (tiles[key].state === 'planted' || tiles[key].state === 'growing');
+                }
+            },
+            {
+                id: 'wait_growth',
+                message: '⏳ Wait for the plant to grow... (time accelerated for tutorial)',
+                action: 'wait',
+                target: { x: 0, y: 0 },
+                condition: () => {
+                    const key = getTileKey(0, 0);
+                    return tiles[key] && tiles[key].state === 'ready';
+                }
+            },
+            {
+                id: 'show_timer',
+                message: '⏱️ Hover or click on the plant to see the timer!',
+                action: 'hover',
+                target: { x: 0, y: 0 },
+                condition: () => tutorialHovered
+            },
+            {
+                id: 'harvest',
+                message: '✂️ Click to harvest!',
+                action: 'click',
+                target: { x: 0, y: 0 },
+                condition: () => {
+                    const key = getTileKey(0, 0);
+                    return tiles[key] && tiles[key].state === 'empty';
+                }
+            },
+            {
+                id: 'buy_seeds',
+                message: '💰 Open the shop and buy more seeds!',
+                action: 'shop',
+                target: null,
+                condition: () => getQuantity(selectedCropId) > 0
+            }
+        ];
+
+        function getCurrentTutorialStep() {
+            if (tutorialStep >= tutorialSteps.length) {
+                return null;
+            }
+            return tutorialSteps[tutorialStep];
+        }
+
+        function updateTutorialUI() {
+            const step = getCurrentTutorialStep();
+            const panel = document.getElementById('tutorialPanel');
+            const message = document.getElementById('tutorialMessage');
+            const skipBtn = document.getElementById('tutorialSkip');
+            const nextBtn = document.getElementById('tutorialNext');
+
+            if (!step) {
+                panel.classList.remove('active');
+                return;
+            }
+
+            panel.classList.add('active');
+            message.textContent = step.message;
+
+            // Show next button only for manual advancement steps
+            if (step.action === 'wait') {
+                nextBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        function advanceTutorial() {
+            const step = getCurrentTutorialStep();
+            if (!step) return;
+
+            if (step.condition()) {
+                tutorialStep++;
+                tutorialHovered = false;
+                tutorialClicked = false;
+
+                const nextStep = getCurrentTutorialStep();
+                if (!nextStep) {
+                    completeTutorial();
+                } else {
+                    updateTutorialUI();
+                    
+                    // Auto-open shop for shop step
+                    if (nextStep.action === 'shop') {
+                        document.getElementById('shopOverlay').classList.add('active');
+                    }
+                    // Auto-open inventory for inventory step
+                    if (nextStep.action === 'inventory') {
+                        document.getElementById('inventoryOverlay').classList.add('active');
+                    }
+                }
+            }
+        }
+
+        function completeTutorial() {
+            tutorialCompleted = true;
+            const panel = document.getElementById('tutorialPanel');
+            const message = document.getElementById('tutorialMessage');
+            const skipBtn = document.getElementById('tutorialSkip');
+            const nextBtn = document.getElementById('tutorialNext');
+
+            message.textContent = '🎉 Tutorial complete! Good luck with your farm!';
+            skipBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+
+            setTimeout(() => {
+                panel.classList.remove('active');
+            }, 3000);
+        }
+
+        function skipTutorial() {
+            tutorialCompleted = true;
+            const panel = document.getElementById('tutorialPanel');
+            panel.classList.remove('active');
+        }
+
+        function drawTutorialHighlight() {
+            if (tutorialCompleted || !tutorialTileTarget) return;
+
+            const step = getCurrentTutorialStep();
+            if (!step || !step.target) return;
+
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+
+            const screenX = (step.target.x + halfSize) * tileSize;
+            const screenY = (step.target.y + halfSize) * tileSize;
+
+            // Draw highlight directly on canvas
+            ctx.save();
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            ctx.strokeRect(screenX, screenY, tileSize, tileSize);
+
+            ctx.restore();
+        }
+
+        // ===== RENDERING =====
+        function getRandomDirtTile() {
+            const dirtTiles = ['dirt_tile_01', 'dirt_tile_02', 'dirt_tile_03', 'dirt_tile_04'];
+            // Use deterministic seeding based on tile position for consistent variation
+            return dirtTiles;
+        }
+
+        function drawTile(x, y, tile) {
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            const screenX = (x + halfSize) * tileSize;
+            const screenY = (y + halfSize) * tileSize;
+            
+            // Draw base tile
+            if (tile.state === 'locked') {
+                if (assetCache['locked_tile']) {
+                    ctx.drawImage(assetCache['locked_tile'], screenX, screenY, tileSize, tileSize);
+                } else {
+                    ctx.fillStyle = '#4a3a6b';
+                    ctx.fillRect(screenX, screenY, tileSize, tileSize);
+                }
+            } else {
+                // Use variation tiles for visual variety
+                const dirtTiles = ['dirt_tile_01', 'dirt_tile_02', 'dirt_tile_03', 'dirt_tile_04'];
+                // Deterministic variation based on tile coordinates
+                const tileVariation = dirtTiles[Math.abs((x * 73 + y * 97) % dirtTiles.length)];
+                
+                if (assetCache[tileVariation]) {
+                    ctx.drawImage(assetCache[tileVariation], screenX, screenY, tileSize, tileSize);
+                } else if (assetCache['soil_tile']) {
+                    ctx.drawImage(assetCache['soil_tile'], screenX, screenY, tileSize, tileSize);
+                } else {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(screenX, screenY, tileSize, tileSize);
+                }
+            }
+            
+            // Draw crop if planted
+            if (tile.state !== 'locked' && tile.state !== 'empty' && tile.cropId) {
+                const crop = getCropById(tile.cropId);
+                if (crop) {
+                    let spriteId = null;
+                    if (tile.state === 'planted') spriteId = crop.sprites.seed;
+                    else if (tile.state === 'growing') spriteId = crop.sprites.growing;
+                    else if (tile.state === 'ready') spriteId = crop.sprites.ready;
+                    
+                    if (spriteId && assetCache[spriteId]) {
+                        ctx.drawImage(assetCache[spriteId], screenX, screenY, tileSize, tileSize);
+                    }
+                }
+            }
+            
+            // Draw lock overlay on locked tiles
+            if (tile.state === 'locked' && assetCache['lock_overlay']) {
+                ctx.drawImage(assetCache['lock_overlay'], screenX, screenY, tileSize, tileSize);
+            }
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(screenX, screenY, tileSize, tileSize);
+        }
+
+        function drawParticles() {
+            particles.forEach((particle, index) => {
+                const age = Date.now() - particle.startTime;
+                const lifespan = 500; // 0.5 seconds
+                
+                if (age > lifespan) {
+                    particles.splice(index, 1);
+                    return;
+                }
+                
+                const progress = age / lifespan;
+                const alpha = 1 - progress;
+                const scale = 0.5 + progress * 0.5;
+                
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.translate(particle.x, particle.y);
+                ctx.rotate(progress * Math.PI * 2);
+                ctx.scale(scale, scale);
+                
+                ctx.fillStyle = particle.color;
+                ctx.fillRect(-4, -4, 8, 8);
+                
+                ctx.restore();
+            });
+        }
+
+        function createHarvestParticles(x, y) {
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            const screenX = (x + halfSize) * tileSize + tileSize / 2;
+            const screenY = (y + halfSize) * tileSize + tileSize / 2;
+            
+            const colors = ['#FFD700', '#FFA500', '#FFFF00', '#FF8C00'];
+            
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 * i) / 8;
+                const distance = 20 + Math.random() * 20;
+                
+                particles.push({
+                    x: screenX + Math.cos(angle) * distance,
+                    y: screenY + Math.sin(angle) * distance,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    startTime: Date.now()
+                });
+            }
+        }
+
+        function drawGrowthTimer(x, y, tile, currentTime) {
+            if (tile.state !== 'planted' && tile.state !== 'growing') {
+                return;
+            }
+            
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            const screenX = (x + halfSize) * tileSize + tileSize / 2;
+            const screenY = (y + halfSize) * tileSize - 8; // Offset above tile
+            
+            const timeRemaining = getTimeRemaining(tile, currentTime);
+            const timeStr = formatTime(timeRemaining);
+            
+            // Draw timer background
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2;
+            
+            const textMetrics = ctx.measureText(timeStr);
+            const textWidth = textMetrics.width;
+            const textHeight = 20;
+            const padding = 6;
+            
+            const bgX = screenX - textWidth / 2 - padding;
+            const bgY = screenY - textHeight / 2 - padding;
+            const bgWidth = textWidth + padding * 2;
+            const bgHeight = textHeight + padding * 2;
+            
+            ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
+            ctx.strokeRect(bgX, bgY, bgWidth, bgHeight);
+            
+            // Draw timer text
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 16px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(timeStr, screenX, screenY);
+            
+            ctx.restore();
+        }
+
+        function render(currentTime = Date.now()) {
+            if (!ctx) return;
+            
+            // Clear canvas
+            ctx.fillStyle = window.gameConfig.visual.backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw all tiles
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            for (let x = -halfSize; x <= halfSize; x++) {
+                for (let y = -halfSize; y <= halfSize; y++) {
+                    const key = getTileKey(x, y);
+                    if (tiles[key]) {
+                        drawTile(x, y, tiles[key]);
+                    }
+                }
+            }
+            
+            // Draw growth timers for hovered or selected tiles
+            if (hoveredTile) {
+                const key = getTileKey(hoveredTile.x, hoveredTile.y);
+                if (tiles[key]) {
+                    drawGrowthTimer(hoveredTile.x, hoveredTile.y, tiles[key], currentTime);
+                }
+            }
+            
+            if (selectedTile && (!hoveredTile || (hoveredTile.x !== selectedTile.x || hoveredTile.y !== selectedTile.y))) {
+                const key = getTileKey(selectedTile.x, selectedTile.y);
+                if (tiles[key]) {
+                    drawGrowthTimer(selectedTile.x, selectedTile.y, tiles[key], currentTime);
+                }
+            }
+            
+            // Draw particles
+            drawParticles();
+            
+            // Draw tutorial highlight
+            if (!tutorialCompleted) {
+                drawTutorialHighlight();
+            }
+        }
+
+        // ===== INPUT HANDLING =====
+        function getGridCoordinates(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            const canvasX = (clientX - rect.left) * scaleX;
+            const canvasY = (clientY - rect.top) * scaleY;
+            
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            const gridX = Math.floor(canvasX / tileSize) - halfSize;
+            const gridY = Math.floor(canvasY / tileSize) - halfSize;
+            
+            return { x: gridX, y: gridY };
+        }
+
+        function handleTileClick(x, y) {
+            // Block clicks outside tutorial target during tutorial
+            if (!tutorialCompleted) {
+                const step = getCurrentTutorialStep();
+                if (step && step.target && (x !== step.target.x || y !== step.target.y)) {
+                    playSound('error_sound');
+                    return;
+                }
+            }
+
+            const key = getTileKey(x, y);
+            const tile = tiles[key];
+            
+            if (!tile) return;
+            
+            // Mark tutorial click
+            if (!tutorialCompleted) {
+                tutorialClicked = true;
+                advanceTutorial();
+            }
+            
+            // Toggle selection for growing plants to show timer
+            if ((tile.state === 'planted' || tile.state === 'growing') && 
+                selectedTile && selectedTile.x === x && selectedTile.y === y) {
+                // Deselect
+                selectedTile = null;
+                render();
+                return;
+            }
+            
+            if (tile.state === 'locked') {
+                if (audioManager) audioManager.playSfx('error_sound');
+                return;
+            }
+            
+            if (tile.state === 'empty') {
+                // Try to plant
+                if (!selectedCropId) {
+                    if (audioManager) audioManager.playSfx('error_sound');
+                    return;
+                }
+                
+                const crop = getCropById(selectedCropId);
+                if (!crop) return;
+                
+                // Check if player has seeds
+                if (!hasItem(selectedCropId, 1)) {
+                    if (audioManager) audioManager.playSfx('error_sound');
+                    return;
+                }
+                
+                // Plant the seed
+                removeItem(selectedCropId, 1);
+                tile.state = 'planted';
+                tile.cropId = selectedCropId;
+                tile.plantedTime = Date.now();
+                
+                if (audioManager) audioManager.playSfx('plant_sound');
+                render();
+            } else if (tile.state === 'ready') {
+                // Harvest
+                const crop = getCropById(tile.cropId);
+                if (!crop) return;
+                
+                const harvestMultiplier = getHarvestMultiplier();
+                coins += Math.floor(crop.harvestValue * harvestMultiplier);
+                
+                tile.state = 'empty';
+                tile.cropId = null;
+                tile.plantedTime = 0;
+                
+                createHarvestParticles(x, y);
+                if (audioManager) audioManager.playSfx('harvest_sound');
+                updateUI();
+                render();
+            } else if (tile.state === 'planted' || tile.state === 'growing') {
+                // Select growing plant to show timer
+                selectedTile = { x, y };
+                render();
+            }
+        }
+
+        // ===== UI FUNCTIONS =====
+        function updateUI() {
+            document.getElementById('coinCount').textContent = coins;
+            
+            const nextRing = currentRing + 1;
+            const ringCost = window.gameConfig.economy.ringCosts[nextRing] || 9999;
+            
+            // Update header expand button
+            const expandButton = document.getElementById('expandButton');
+            if (expandButton) {
+                if (nextRing < window.gameConfig.economy.ringCosts.length) {
+                    expandButton.querySelector('span').textContent = `${ringCost} coins`;
+                    expandButton.disabled = coins < ringCost;
+                } else {
+                    expandButton.querySelector('span').textContent = 'Max Size';
+                    expandButton.disabled = true;
+                }
+            }
+            
+            // Update footer expand button
+            const expandButtonFooter = document.getElementById('expandButtonFooter');
+            if (expandButtonFooter) {
+                if (nextRing < window.gameConfig.economy.ringCosts.length) {
+                    expandButtonFooter.querySelector('span').textContent = `${ringCost} coins`;
+                    expandButtonFooter.disabled = coins < ringCost;
+                } else {
+                    expandButtonFooter.querySelector('span').textContent = 'Max Size';
+                    expandButtonFooter.disabled = true;
+                }
+            }
+        }
+
+        function updateShopUI() {
+            const shopGrid = document.getElementById('shopGrid');
+            shopGrid.innerHTML = '';
+            
+            window.gameConfig.crops.forEach(crop => {
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                
+                const icon = document.createElement('img');
+                icon.className = 'shop-item-icon';
+                if (assetCache[crop.sprites.seed]) {
+                    icon.src = assetCache[crop.sprites.seed].src;
+                }
+                
+                const name = document.createElement('div');
+                name.className = 'shop-item-name';
+                name.textContent = crop.name + ' Seed';
+                
+                const cost = document.createElement('div');
+                cost.className = 'shop-item-cost';
+                
+                const coinIcon = document.createElement('img');
+                coinIcon.className = 'coin-icon';
+                if (assetCache['coin_icon']) {
+                    coinIcon.src = assetCache['coin_icon'].src;
+                }
+                coinIcon.style.width = '24px';
+                coinIcon.style.height = '24px';
+                
+                const costText = document.createElement('span');
+                costText.textContent = crop.seedCost;
+                
+                cost.appendChild(coinIcon);
+                cost.appendChild(costText);
+                
+                item.appendChild(icon);
+                item.appendChild(name);
+                item.appendChild(cost);
+                
+                item.addEventListener('click', () => {
+                    if (coins >= crop.seedCost) {
+                        coins -= crop.seedCost;
+                        addItem(crop.id, crop.name + ' Seed', 'seed', 1, crop.seedCost);
+                        selectedCropId = crop.id;
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                        updateUI();
+                        
+                        // Tutorial advancement
+                        if (!tutorialCompleted) {
+                            advanceTutorial();
+                        }
+                    } else {
+                        if (audioManager) audioManager.playSfx('error_sound');
+                    }
+                });
+                
+                shopGrid.appendChild(item);
+            });
+        }
+
+        function updateInventoryUI() {
+            const inventoryGrid = document.getElementById('inventoryGrid');
+            inventoryGrid.innerHTML = '';
+            
+            Object.values(inventory).forEach(item => {
+                // Only show items with quantity > 0
+                if (item.quantity <= 0) {
+                    return;
+                }
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'inventory-item';
+                
+                const icon = document.createElement('img');
+                icon.className = 'inventory-item-icon';
+                
+                // Find the crop and use its seed sprite
+                const crop = getCropById(item.id);
+                if (crop && assetCache[crop.sprites.seed]) {
+                    icon.src = assetCache[crop.sprites.seed].src;
+                }
+                
+                const name = document.createElement('div');
+                name.className = 'inventory-item-name';
+                name.textContent = item.name;
+                
+                const quantity = document.createElement('div');
+                quantity.className = 'inventory-item-quantity';
+                quantity.textContent = `×${item.quantity}`;
+                
+                itemDiv.appendChild(icon);
+                itemDiv.appendChild(name);
+                itemDiv.appendChild(quantity);
+                
+                // Click to select seed for planting
+                if (item.type === 'seed') {
+                    itemDiv.style.cursor = 'pointer';
+                    itemDiv.addEventListener('click', () => {
+                        selectedCropId = item.id;
+                        itemDiv.style.background = 'rgba(76, 175, 80, 0.5)';
+                        
+                        // Tutorial advancement
+                        if (!tutorialCompleted) {
+                            advanceTutorial();
+                        }
+                        
+                        // Reset other items
+                        Array.from(inventoryGrid.children).forEach(child => {
+                            if (child !== itemDiv) {
+                                child.style.background = 'rgba(255, 255, 255, 0.3)';
+                            }
+                        });
+                    });
+                }
+                
+                inventoryGrid.appendChild(itemDiv);
+            });
+        }
+
+        function updatePowerupsUI() {
+            const container = document.getElementById('powerupsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (!window.gameConfig.powerups) return;
+            
+            window.gameConfig.powerups.forEach(powerup => {
+                const item = document.createElement('div');
+                item.className = 'powerup-item';
+                
+                const isActive = isPowerupActive(powerup.id);
+                const isOnCooldown = isPowerupOnCooldown(powerup.id);
+                
+                if (isOnCooldown) {
+                    item.classList.add('powerup-cooldown');
+                }
+                
+                // Icon
+                const icon = document.createElement('img');
+                icon.className = 'powerup-icon';
+                if (assetCache[powerup.icon]) {
+                    icon.src = assetCache[powerup.icon].src;
+                }
+                item.appendChild(icon);
+                
+                // AD Badge
+                const badge = document.createElement('div');
+                badge.className = 'powerup-badge';
+                if (isActive || isOnCooldown) {
+                    badge.classList.add('hidden');
+                } else {
+                    badge.textContent = 'AD';
+                }
+                item.appendChild(badge);
+                
+                // Timer bar
+                const timerContainer = document.createElement('div');
+                timerContainer.className = 'powerup-timer';
+                
+                const timerFill = document.createElement('div');
+                timerFill.className = 'powerup-timer-fill';
+                
+                if (isActive) {
+                    const remaining = getPowerupTimeRemaining(powerup.id);
+                    const progress = (remaining / powerup.duration) * 100;
+                    timerFill.style.width = progress + '%';
+                } else if (isOnCooldown) {
+                    timerFill.classList.add('cooldown');
+                    const remaining = getPowerupCooldownRemaining(powerup.id);
+                    const progress = (remaining / powerup.cooldown) * 100;
+                    timerFill.style.width = progress + '%';
+                } else {
+                    timerFill.style.width = '0%';
+                }
+                
+                timerContainer.appendChild(timerFill);
+                item.appendChild(timerContainer);
+                
+                // Click handler
+                item.addEventListener('click', () => {
+                    if (!isOnCooldown && !isActive) {
+                        showAdSimulation(powerup.id);
+                    }
+                });
+                
+                container.appendChild(item);
+            });
+        }
+
+        // ===== GAME LOOP =====
+        function gameLoop(currentTime) {
+            if (currentMode !== 'play' || MenuManager.isPaused) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.11);
+            lastTime = currentTime;
+            
+            updateCropGrowth(Date.now());
+            
+            // Update power-ups UI every frame
+            updatePowerupsUI();
+            
+            // Check for expired power-ups and start cooldowns
+            if (window.gameConfig.powerups) {
+                window.gameConfig.powerups.forEach(powerup => {
+                    if (isPowerupActive(powerup.id) && !isPowerupOnCooldown(powerup.id)) {
+                        const remaining = getPowerupTimeRemaining(powerup.id);
+                        if (remaining <= 0) {
+                            deactivatePowerup(powerup.id);
+                        }
+                    }
+                });
+            }
+            
+            // Tutorial growth acceleration
+            if (!tutorialCompleted) {
+                const step = getCurrentTutorialStep();
+                if (step && step.id === 'wait_growth') {
+                    // Accelerate growth during tutorial wait step
+                    const key = getTileKey(0, 0);
+                    if (tiles[key] && tiles[key].state === 'growing') {
+                        tiles[key].plantedTime -= 100; // Accelerate by 100ms per frame
+                    }
+                }
+                
+                // Check tutorial conditions
+                advanceTutorial();
+            }
+            
+            render(Date.now());
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ===== INITIALIZATION =====
+        function initializeGame() {
+            // Initialize coins and inventory from config
+            coins = window.gameConfig.economy.startingCoins;
+            inventory = {};
+            
+            // Add starting seeds to inventory
+            Object.entries(window.gameConfig.economy.startingSeeds).forEach(([cropId, quantity]) => {
+                const crop = getCropById(cropId);
+                if (crop) {
+                    addItem(cropId, crop.name + ' Seed', 'seed', quantity, crop.seedCost);
+                }
+            });
+            
+            // Select first crop by default
+            if (window.gameConfig.crops.length > 0) {
+                selectedCropId = window.gameConfig.crops[0].id;
+            }
+            
+            // Initialize tiles
+            currentRing = 0;
+            initializeTiles();
+            
+            // Initialize power-ups
+            activePowerups = {};
+            updatePowerupsUI();
+            
+            // Start tutorial if not completed
+            tutorialStep = 0;
+            tutorialCompleted = false;
+            updateTutorialUI();
+            
+            updateUI();
+            updateShopUI();
+            updateInventoryUI();
+        }
+
+        function setupCanvas() {
+            canvas = document.getElementById('farmCanvas');
+            if (!canvas) return;
+            
+            ctx = canvas.getContext('2d');
+            
+            const tileSize = window.gameConfig.visual.tileSize;
+            const gridSize = window.gameConfig.visual.gridSize;
+            
+            canvas.width = tileSize * gridSize;
+            canvas.height = tileSize * gridSize;
+            
+            // Make canvas responsive based on layout
+            const mainArea = document.querySelector('.main');
+            if (!mainArea) return;
+            
+            // Calculate available space
+            let maxWidth = mainArea.clientWidth * 0.95;
+            let maxHeight = mainArea.clientHeight * 0.95;
+            
+            // Apply safe area constraints
+            maxWidth -= (LayoutManager.safeArea.left + LayoutManager.safeArea.right);
+            maxHeight -= (LayoutManager.safeArea.top + LayoutManager.safeArea.bottom);
+            
+            // Ensure we have valid dimensions
+            if (maxWidth <= 0 || maxHeight <= 0) {
+                // Fallback to viewport dimensions based on layout
+                let vwScale, vhScale;
+                
+                if (LayoutManager.currentLayout === 'landscape' || LayoutManager.currentLayout === 'tablet-landscape') {
+                    vwScale = Math.min(window.innerWidth * 0.75, 900);
+                    vhScale = Math.min(window.innerHeight * 0.85, 700);
+                } else if (LayoutManager.currentLayout === 'desktop') {
+                    vwScale = Math.min(window.innerWidth * 0.85, 1000);
+                    vhScale = Math.min(window.innerHeight * 0.70, 800);
+                } else {
+                    vwScale = Math.min(window.innerWidth * 0.90, 600);
+                    vhScale = Math.min(window.innerHeight * 0.60, 600);
+                }
+                
+                const scale = Math.min(vwScale / canvas.width, vhScale / canvas.height, 1);
+                canvas.style.width = (canvas.width * scale) + 'px';
+                canvas.style.height = (canvas.height * scale) + 'px';
+            } else {
+                const scale = Math.min(maxWidth / canvas.width, maxHeight / canvas.height, 1);
+                canvas.style.width = (canvas.width * scale) + 'px';
+                canvas.style.height = (canvas.height * scale) + 'px';
+            }
+            
+            // Ensure canvas doesn't overflow
+            const canvasDisplayWidth = parseFloat(canvas.style.width);
+            const canvasDisplayHeight = parseFloat(canvas.style.height);
+            
+            if (canvasDisplayWidth > maxWidth || canvasDisplayHeight > maxHeight) {
+                const scale = Math.min(maxWidth / canvasDisplayWidth, maxHeight / canvasDisplayHeight, 1);
+                canvas.style.width = (canvasDisplayWidth * scale) + 'px';
+                canvas.style.height = (canvasDisplayHeight * scale) + 'px';
+            }
+        }
+
+        function setupEventListeners() {
+            // ===== GLOBAL KEYBOARD LISTENER =====
+            document.addEventListener('keydown', (e) => {
+                // Ignore if remapping is active
+                if (KeyBindingsManager.isRemapping) {
+                    KeyBindingsManager.handleRemappingKeyPress(e);
+                    return;
+                }
+                
+                // Ignore if event is repeating
+                if (e.repeat) return;
+                
+                // Ignore if focus is on input element
+                const activeElement = document.activeElement;
+                if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                    return;
+                }
+                
+                const keyCode = e.code;
+                
+                // Check for menu toggle (ESC always closes any open panel)
+                if (keyCode === KeyBindingsManager.keyBindings.menu) {
+                    e.preventDefault();
+                    
+                    // Close any open overlay first
+                    const shopOverlay = document.getElementById('shopOverlay');
+                    const inventoryOverlay = document.getElementById('inventoryOverlay');
+                    
+                    if (shopOverlay && shopOverlay.classList.contains('active')) {
+                        shopOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                        return;
+                    }
+                    
+                    if (inventoryOverlay && inventoryOverlay.classList.contains('active')) {
+                        inventoryOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                        return;
+                    }
+                    
+                    // Toggle menu
+                    MenuManager.toggleMenu();
+                    return;
+                }
+                
+                // Check for inventory toggle
+                if (keyCode === KeyBindingsManager.keyBindings.inventory) {
+                    e.preventDefault();
+                    
+                    // Close other overlays
+                    const shopOverlay = document.getElementById('shopOverlay');
+                    const menuOverlay = document.getElementById('menuOverlay');
+                    
+                    if (shopOverlay && shopOverlay.classList.contains('active')) {
+                        shopOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    }
+                    
+                    if (menuOverlay && menuOverlay.classList.contains('active')) {
+                        MenuManager.closeMenu();
+                    }
+                    
+                    // Toggle inventory
+                    const inventoryOverlay = document.getElementById('inventoryOverlay');
+                    if (inventoryOverlay.classList.contains('active')) {
+                        inventoryOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    } else {
+                        inventoryOverlay.classList.add('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    }
+                    return;
+                }
+                
+                // Check for shop toggle
+                if (keyCode === KeyBindingsManager.keyBindings.shop) {
+                    e.preventDefault();
+                    
+                    // Close other overlays
+                    const inventoryOverlay = document.getElementById('inventoryOverlay');
+                    const menuOverlay = document.getElementById('menuOverlay');
+                    
+                    if (inventoryOverlay && inventoryOverlay.classList.contains('active')) {
+                        inventoryOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    }
+                    
+                    if (menuOverlay && menuOverlay.classList.contains('active')) {
+                        MenuManager.closeMenu();
+                    }
+                    
+                    // Toggle shop
+                    const shopOverlay = document.getElementById('shopOverlay');
+                    if (shopOverlay.classList.contains('active')) {
+                        shopOverlay.classList.remove('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    } else {
+                        shopOverlay.classList.add('active');
+                        if (audioManager) audioManager.playSfx('purchase_sound');
+                    }
+                    return;
+                }
+            });
+            
+            // Resume audio context on first user interaction (required by modern browsers)
+            const resumeAudioOnInteraction = () => {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        console.log('Audio context resumed');
+                        // Start music after context is resumed
+                        if (audioManager && currentMode === 'play') {
+                            audioManager.playMusic();
+                        }
+                    }).catch(err => {
+                        lib.log('Failed to resume audio context: ' + err);
+                    });
+                }
+                document.removeEventListener('click', resumeAudioOnInteraction);
+                document.removeEventListener('touchstart', resumeAudioOnInteraction);
+            };
+            
+            document.addEventListener('click', resumeAudioOnInteraction);
+            document.addEventListener('touchstart', resumeAudioOnInteraction);
+            
+            // Handle orientation changes with debouncing
+            let orientationTimeout;
+            window.addEventListener('orientationchange', () => {
+                clearTimeout(orientationTimeout);
+                orientationTimeout = setTimeout(() => {
+                    if (LayoutManager.updateLayout()) {
+                        const safeAreaStr = `top:${LayoutManager.safeArea.top}, left:${LayoutManager.safeArea.left}, right:${LayoutManager.safeArea.right}, bottom:${LayoutManager.safeArea.bottom}`;
+                        lib.log(`Orientation changed → Layout: ${LayoutManager.currentLayout} | Device: ${LayoutManager.deviceType} | Screen: ${window.innerWidth}x${window.innerHeight} | SafeArea: ${safeAreaStr}`);
+                        LayoutManager.saveLayoutPreference();
+                    }
+                }, 100);
+            });
+            
+            // Handle window resize with debouncing
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (LayoutManager.updateLayout()) {
+                        const safeAreaStr = `top:${LayoutManager.safeArea.top}, left:${LayoutManager.safeArea.left}, right:${LayoutManager.safeArea.right}, bottom:${LayoutManager.safeArea.bottom}`;
+                        lib.log(`Resize detected → Layout: ${LayoutManager.currentLayout} | Device: ${LayoutManager.deviceType} | Screen: ${window.innerWidth}x${window.innerHeight} | SafeArea: ${safeAreaStr}`);
+                        LayoutManager.saveLayoutPreference();
+                    }
+                }, 100);
+            });
+            
+            // Handle visual viewport changes (for safe area updates)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    LayoutManager.detectSafeArea();
+                    LayoutManager.applySafeArea();
+                });
+                
+                window.visualViewport.addEventListener('scroll', () => {
+                    LayoutManager.detectSafeArea();
+                    LayoutManager.applySafeArea();
+                });
+            }
+            
+            // Canvas click/tap
+            canvas.addEventListener('click', (e) => {
+                const coords = getGridCoordinates(e.clientX, e.clientY);
+                handleTileClick(coords.x, coords.y);
+            });
+            
+            // Canvas mouse move for hover detection
+            canvas.addEventListener('mousemove', (e) => {
+                const coords = getGridCoordinates(e.clientX, e.clientY);
+                hoveredTile = { x: coords.x, y: coords.y };
+                
+                // Tutorial hover detection
+                if (!tutorialCompleted) {
+                    const step = getCurrentTutorialStep();
+                    if (step && step.target && coords.x === step.target.x && coords.y === step.target.y) {
+                        tutorialHovered = true;
+                        advanceTutorial();
+                    }
+                }
+                
+                render();
+            });
+            
+            // Canvas mouse leave to clear hover
+            canvas.addEventListener('mouseleave', () => {
+                hoveredTile = null;
+                tutorialHovered = false;
+                render();
+            });
+            
+            // Canvas touch move for mobile hover detection
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const coords = getGridCoordinates(touch.clientX, touch.clientY);
+                hoveredTile = { x: coords.x, y: coords.y };
+                
+                // Tutorial hover detection
+                if (!tutorialCompleted) {
+                    const step = getCurrentTutorialStep();
+                    if (step && step.target && coords.x === step.target.x && coords.y === step.target.y) {
+                        tutorialHovered = true;
+                        advanceTutorial();
+                    }
+                }
+                
+                render();
+            }, { passive: false });
+            
+            // Canvas touch end to clear hover
+            canvas.addEventListener('touchend', () => {
+                hoveredTile = null;
+                tutorialHovered = false;
+                render();
+            });
+            
+            // Expand button (header)
+            document.getElementById('expandButton').addEventListener('click', () => {
+                const nextRing = currentRing + 1;
+                const ringCost = window.gameConfig.economy.ringCosts[nextRing];
+                
+                if (ringCost !== undefined && coins >= ringCost) {
+                    coins -= ringCost;
+                    currentRing = nextRing;
+                    unlockRing(nextRing);
+                    if (audioManager) audioManager.playSfx('unlock_sound');
+                    updateUI();
+                    render();
+                } else {
+                    if (audioManager) audioManager.playSfx('error_sound');
+                }
+            });
+            
+            // Expand button (footer)
+            document.getElementById('expandButtonFooter').addEventListener('click', () => {
+                const nextRing = currentRing + 1;
+                const ringCost = window.gameConfig.economy.ringCosts[nextRing];
+                
+                if (ringCost !== undefined && coins >= ringCost) {
+                    coins -= ringCost;
+                    currentRing = nextRing;
+                    unlockRing(nextRing);
+                    if (audioManager) audioManager.playSfx('unlock_sound');
+                    updateUI();
+                    render();
+                } else {
+                    if (audioManager) audioManager.playSfx('error_sound');
+                }
+            });
+            
+            // Shop button
+            document.getElementById('shopButton').addEventListener('click', () => {
+                document.getElementById('shopOverlay').classList.add('active');
+            });
+            
+            document.getElementById('closeShop').addEventListener('click', () => {
+                document.getElementById('shopOverlay').classList.remove('active');
+            });
+            
+            // Inventory button
+            document.getElementById('inventoryButton').addEventListener('click', () => {
+                document.getElementById('inventoryOverlay').classList.add('active');
+            });
+            
+            document.getElementById('closeInventory').addEventListener('click', () => {
+                document.getElementById('inventoryOverlay').classList.remove('active');
+            });
+            
+            // Close overlays on background click
+            document.getElementById('shopOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'shopOverlay') {
+                    document.getElementById('shopOverlay').classList.remove('active');
+                }
+            });
+            
+            document.getElementById('inventoryOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'inventoryOverlay') {
+                    document.getElementById('inventoryOverlay').classList.remove('active');
+                }
+            });
+            
+            // Menu button
+            document.getElementById('menuButton').addEventListener('click', () => {
+                MenuManager.toggleMenu();
+            });
+            
+            // Close menu button
+            document.getElementById('closeMenu').addEventListener('click', () => {
+                MenuManager.closeMenu();
+            });
+            
+            // Close menu on background click
+            document.getElementById('menuOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'menuOverlay') {
+                    MenuManager.closeMenu();
+                }
+            });
+            
+            // Menu tab buttons
+            document.querySelectorAll('.menu-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabName = btn.getAttribute('data-tab');
+                    MenuManager.switchTab(tabName);
+                    if (audioManager) audioManager.playSfx('purchase_sound');
+                });
+            });
+            
+            // Settings sliders - with proper event handling and visual feedback
+            const musicVolumeSlider = document.getElementById('musicVolume');
+            if (musicVolumeSlider) {
+                // Update background gradient on input
+                function updateMusicSliderBackground() {
+                    const value = parseInt(musicVolumeSlider.value);
+                    const percent = (value / 100) * 100;
+                    musicVolumeSlider.style.background = `linear-gradient(to right, #4CAF50 0%, #4CAF50 ${percent}%, #ddd ${percent}%, #ddd 100%)`;
+                }
+                
+                musicVolumeSlider.addEventListener('input', (e) => {
+                    const newValue = parseInt(e.target.value);
+                    MenuManager.settings.musicVolume = newValue;
+                    document.getElementById('musicVolumeValue').textContent = newValue + '%';
+                    updateMusicSliderBackground();
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.setMusicVolume(newValue / 100);
+                    }
+                    
+                    // Test sound with new volume
+                    if (audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                });
+                
+                musicVolumeSlider.addEventListener('change', (e) => {
+                    const newValue = parseInt(e.target.value);
+                    MenuManager.settings.musicVolume = newValue;
+                    document.getElementById('musicVolumeValue').textContent = newValue + '%';
+                    updateMusicSliderBackground();
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.setMusicVolume(newValue / 100);
+                    }
+                });
+                
+                // Initialize background
+                updateMusicSliderBackground();
+            }
+            
+            const sfxVolumeSlider = document.getElementById('sfxVolume');
+            if (sfxVolumeSlider) {
+                // Update background gradient on input
+                function updateSfxSliderBackground() {
+                    const value = parseInt(sfxVolumeSlider.value);
+                    const percent = (value / 100) * 100;
+                    sfxVolumeSlider.style.background = `linear-gradient(to right, #4CAF50 0%, #4CAF50 ${percent}%, #ddd ${percent}%, #ddd 100%)`;
+                }
+                
+                sfxVolumeSlider.addEventListener('input', (e) => {
+                    const newValue = parseInt(e.target.value);
+                    MenuManager.settings.sfxVolume = newValue;
+                    document.getElementById('sfxVolumeValue').textContent = newValue + '%';
+                    updateSfxSliderBackground();
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.setSfxVolume(newValue / 100);
+                    }
+                    
+                    // Test sound with new volume
+                    if (audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                });
+                
+                sfxVolumeSlider.addEventListener('change', (e) => {
+                    const newValue = parseInt(e.target.value);
+                    MenuManager.settings.sfxVolume = newValue;
+                    document.getElementById('sfxVolumeValue').textContent = newValue + '%';
+                    updateSfxSliderBackground();
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.setSfxVolume(newValue / 100);
+                    }
+                });
+                
+                // Initialize background
+                updateSfxSliderBackground();
+            }
+            
+            // Settings checkboxes - with proper event delegation
+            const musicEnabledCheckbox = document.getElementById('musicEnabled');
+            if (musicEnabledCheckbox) {
+                musicEnabledCheckbox.addEventListener('change', (e) => {
+                    MenuManager.settings.musicEnabled = e.target.checked;
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.toggleMusic(e.target.checked);
+                    }
+                    
+                    // Test sound
+                    if (e.target.checked && audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                });
+            }
+            
+            const sfxEnabledCheckbox = document.getElementById('sfxEnabled');
+            if (sfxEnabledCheckbox) {
+                sfxEnabledCheckbox.addEventListener('change', (e) => {
+                    MenuManager.settings.sfxEnabled = e.target.checked;
+                    MenuManager.saveSettings();
+                    
+                    // Update AudioManager
+                    if (audioManager) {
+                        audioManager.toggleSfx(e.target.checked);
+                    }
+                    
+                    // Test sound
+                    if (e.target.checked && audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                });
+            }
+            
+            const fullscreenCheckbox = document.getElementById('fullscreenEnabled');
+            if (fullscreenCheckbox) {
+                fullscreenCheckbox.addEventListener('change', (e) => {
+                    MenuManager.settings.fullscreenEnabled = e.target.checked;
+                    MenuManager.saveSettings();
+                    
+                    if (e.target.checked) {
+                        if (document.documentElement.requestFullscreen) {
+                            document.documentElement.requestFullscreen().catch(err => {
+                                lib.log('Fullscreen request failed: ' + err);
+                            });
+                        } else if (document.documentElement.webkitRequestFullscreen) {
+                            document.documentElement.webkitRequestFullscreen();
+                        }
+                    } else {
+                        if (document.fullscreenElement) {
+                            document.exitFullscreen();
+                        } else if (document.webkitFullscreenElement) {
+                            document.webkitExitFullscreen();
+                        }
+                    }
+                });
+            }
+            
+            const largeUICheckbox = document.getElementById('largeUIEnabled');
+            if (largeUICheckbox) {
+                largeUICheckbox.addEventListener('change', (e) => {
+                    MenuManager.settings.largeUIEnabled = e.target.checked;
+                    MenuManager.saveSettings();
+                    MenuManager.applySettings();
+                });
+            }
+            
+            const animationsCheckbox = document.getElementById('animationsEnabled');
+            if (animationsCheckbox) {
+                animationsCheckbox.addEventListener('change', (e) => {
+                    MenuManager.settings.animationsEnabled = e.target.checked;
+                    MenuManager.saveSettings();
+                    MenuManager.applySettings();
+                });
+            }
+            
+            // Add sound effects to all buttons
+            document.querySelectorAll('.ui-button, .expand-button, .close-button, .tutorial-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                });
+            });
+            
+            // Add sound effects to shop items
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.shop-item')) {
+                    if (audioManager) {
+                        audioManager.playSfx('purchase_sound');
+                    }
+                }
+            });
+            
+            // ESC key to close menu
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && MenuManager.isOpen) {
+                    MenuManager.closeMenu();
+                }
+            });
+            
+            // Remap buttons (Settings tab)
+            const settingsRemapMenuBtn = document.getElementById('remapMenu');
+            if (settingsRemapMenuBtn) {
+                settingsRemapMenuBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('menu');
+                });
+            }
+            
+            const settingsRemapInventoryBtn = document.getElementById('remapInventory');
+            if (settingsRemapInventoryBtn) {
+                settingsRemapInventoryBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('inventory');
+                });
+            }
+            
+            const settingsRemapShopBtn = document.getElementById('remapShop');
+            if (settingsRemapShopBtn) {
+                settingsRemapShopBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('shop');
+                });
+            }
+            
+            // Remap buttons (Controls tab)
+            const controlsRemapMenuBtn = document.getElementById('controlsRemapMenu');
+            if (controlsRemapMenuBtn) {
+                controlsRemapMenuBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('menu');
+                });
+            }
+            
+            const controlsRemapInventoryBtn = document.getElementById('controlsRemapInventory');
+            if (controlsRemapInventoryBtn) {
+                controlsRemapInventoryBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('inventory');
+                });
+            }
+            
+            const controlsRemapShopBtn = document.getElementById('controlsRemapShop');
+            if (controlsRemapShopBtn) {
+                controlsRemapShopBtn.addEventListener('click', () => {
+                    KeyBindingsManager.startRemapping('shop');
+                });
+            }
+            
+            // Tutorial buttons
+            document.getElementById('tutorialSkip').addEventListener('click', () => {
+                skipTutorial();
+            });
+            
+            document.getElementById('tutorialNext').addEventListener('click', () => {
+                tutorialStep++;
+                tutorialHovered = false;
+                tutorialClicked = false;
+                
+                const nextStep = getCurrentTutorialStep();
+                if (!nextStep) {
+                    completeTutorial();
+                } else {
+                    updateTutorialUI();
+                    
+                    // Auto-open shop for shop step
+                    if (nextStep.action === 'shop') {
+                        document.getElementById('shopOverlay').classList.add('active');
+                    }
+                    // Auto-open inventory for inventory step
+                    if (nextStep.action === 'inventory') {
+                        document.getElementById('inventoryOverlay').classList.add('active');
+                    }
+                }
+            });
+        }
+
+        function setupUIIcons() {
+            // Set UI icons
+            if (assetCache['coin_icon']) {
+                document.getElementById('coinIcon').src = assetCache['coin_icon'].src;
+            }
+            if (assetCache['expand_icon']) {
+                document.getElementById('expandIcon').src = assetCache['expand_icon'].src;
+                document.getElementById('expandIconFooter').src = assetCache['expand_icon'].src;
+            }
+            if (assetCache['icon_shop_button']) {
+                document.getElementById('shopIcon').src = assetCache['icon_shop_button'].src;
+            }
+            if (assetCache['inventory_icon']) {
+                document.getElementById('inventoryIcon').src = assetCache['inventory_icon'].src;
+            }
+            if (assetCache['settings_gear_icon']) {
+                document.getElementById('menuIcon').src = assetCache['settings_gear_icon'].src;
+            }
+            
+            // Set menu tab icons
+            if (assetCache['settings_gear_icon']) {
+                document.getElementById('settingsTabIcon').src = assetCache['settings_gear_icon'].src;
+            }
+            if (assetCache['menu_icon_controls']) {
+                document.getElementById('controlsTabIcon').src = assetCache['menu_icon_controls'].src;
+            }
+            if (assetCache['menu_icon_about']) {
+                document.getElementById('aboutTabIcon').src = assetCache['menu_icon_about'].src;
+            }
+            
+            // Set settings icons
+            if (assetCache['icon_music_volume']) {
+                document.getElementById('musicVolumeIcon').src = assetCache['icon_music_volume'].src;
+            }
+            if (assetCache['icon_sfx_volume']) {
+                document.getElementById('sfxVolumeIcon').src = assetCache['icon_sfx_volume'].src;
+            }
+            if (assetCache['icon_music_enabled']) {
+                document.getElementById('musicEnabledIcon').src = assetCache['icon_music_enabled'].src;
+            }
+            if (assetCache['icon_sfx_enabled']) {
+                document.getElementById('sfxEnabledIcon').src = assetCache['icon_sfx_enabled'].src;
+            }
+            if (assetCache['icon_fullscreen']) {
+                document.getElementById('fullscreenIcon').src = assetCache['icon_fullscreen'].src;
+            }
+            if (assetCache['icon_large_ui']) {
+                document.getElementById('largeUIIcon').src = assetCache['icon_large_ui'].src;
+            }
+            if (assetCache['icon_animations']) {
+                document.getElementById('animationsIcon').src = assetCache['icon_animations'].src;
+            }
+            
+            // Set controls tab icons
+            if (assetCache['menu_icon_controls']) {
+                document.getElementById('controlsMouseIcon').src = assetCache['menu_icon_controls'].src;
+            }
+            if (assetCache['icon_harvest']) {
+                document.getElementById('controlsHarvestIcon').src = assetCache['icon_harvest'].src;
+            }
+            if (assetCache['inventory_icon']) {
+                document.getElementById('controlsInventoryIcon').src = assetCache['inventory_icon'].src;
+            }
+            if (assetCache['icon_animations']) {
+                document.getElementById('controlsTimerIcon').src = assetCache['icon_animations'].src;
+            }
+            if (assetCache['icon_expand_farm']) {
+                document.getElementById('controlsExpandIcon').src = assetCache['icon_expand_farm'].src;
+            }
+            if (assetCache['icon_shop_button']) {
+                document.getElementById('controlsShopIcon').src = assetCache['icon_shop_button'].src;
+            }
+            if (assetCache['icon_expand_farm']) {
+                document.getElementById('controlsPowerupIcon').src = assetCache['icon_expand_farm'].src;
+            }
+        }
+
+        // ===== MAIN RUN FUNCTION =====
+        async function run(mode) {
+            lib.log('run() called. Mode: ' + mode);
+            currentMode = mode;
+            
+            // Initialize layout manager with full detection
+            LayoutManager.detectDPI();
+            LayoutManager.detectSafeArea();
+            LayoutManager.deviceType = LayoutManager.detectDeviceType();
+            LayoutManager.currentLayout = LayoutManager.detectLayout();
+            document.body.dataset.layout = LayoutManager.currentLayout;
+            document.body.dataset.device = LayoutManager.deviceType;
+            
+            const safeAreaStr = `top:${LayoutManager.safeArea.top}, left:${LayoutManager.safeArea.left}, right:${LayoutManager.safeArea.right}, bottom:${LayoutManager.safeArea.bottom}`;
+            lib.log(`Layout: ${LayoutManager.currentLayout} | Device: ${LayoutManager.deviceType} | DPI: ${LayoutManager.dpi.toFixed(0)} | Screen: ${window.innerWidth}x${window.innerHeight} | SafeArea: ${safeAreaStr}`);
+            
+            // Ensure gameConfig exists with all required properties
+            if (!window.gameConfig) {
+                window.gameConfig = {};
+            }
+            
+            // Ensure all required gameConfig properties exist
+            if (!window.gameConfig.crops) {
+                window.gameConfig.crops = [];
+            }
+            if (!window.gameConfig.economy) {
+                window.gameConfig.economy = { startingCoins: 50, ringCosts: [], startingSeeds: {} };
+            }
+            if (!window.gameConfig.visual) {
+                window.gameConfig.visual = { gridSize: 9, tileSize: 64, backgroundColor: '#816c32' };
+            }
+            if (!window.gameConfig.powerups) {
+                window.gameConfig.powerups = [];
+            }
+            
+            // Load key bindings
+            KeyBindingsManager.loadBindings();
+            
+            // Initialize audio context
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create AudioManager instance
+            audioManager = new AudioManager(audioContext);
+            
+            // Preload all assets
+            await preloadAssets();
+            
+            // Apply layout styling
+            LayoutManager.applyFontScaling();
+            LayoutManager.applySafeArea();
+            LayoutManager.updateUIElements();
+            
+            // Setup canvas (now safe to call)
+            setupCanvas();
+            
+            // Setup UI icons
+            setupUIIcons();
+            
+            // Load menu settings
+            MenuManager.loadSettings();
+            
+            // Sync AudioManager with MenuManager settings
+            if (audioManager) {
+                audioManager.musicVolume = MenuManager.settings.musicVolume;
+                audioManager.sfxVolume = MenuManager.settings.sfxVolume;
+                audioManager.musicEnabled = MenuManager.settings.musicEnabled;
+                audioManager.sfxEnabled = MenuManager.settings.sfxEnabled;
+            }
+            
+            // Update remap button displays
+            const remapMenuBtn = document.getElementById('remapMenu');
+            if (remapMenuBtn) {
+                remapMenuBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.menu)})`;
+            }
+            
+            const remapInventoryBtn = document.getElementById('remapInventory');
+            if (remapInventoryBtn) {
+                remapInventoryBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.inventory)})`;
+            }
+            
+            const remapShopBtn = document.getElementById('remapShop');
+            if (remapShopBtn) {
+                remapShopBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.shop)})`;
+            }
+            
+            // Update Controls tab remap button displays
+            const controlsRemapMenuBtn = document.getElementById('controlsRemapMenu');
+            if (controlsRemapMenuBtn) {
+                controlsRemapMenuBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.menu)})`;
+            }
+            
+            const controlsRemapInventoryBtn = document.getElementById('controlsRemapInventory');
+            if (controlsRemapInventoryBtn) {
+                controlsRemapInventoryBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.inventory)})`;
+            }
+            
+            const controlsRemapShopBtn = document.getElementById('controlsRemapShop');
+            if (controlsRemapShopBtn) {
+                controlsRemapShopBtn.textContent = `Change Key (${KeyBindingsManager.getKeyDisplayName(KeyBindingsManager.keyBindings.shop)})`;
+            }
+            
+            // Show game parameters UI
+            lib.showGameParameters({
+                name: 'Farm Settings',
+                params: {
+                    'Starting Coins': {
+                        key: 'gameConfig.economy.startingCoins',
+                        type: 'number',
+                        min: 10,
+                        max: 1000,
+                        onChange: (value) => {
+                            window.gameConfig.economy.startingCoins = value;
+                        }
+                    },
+                    'Grid Size': {
+                        key: 'gameConfig.visual.gridSize',
+                        type: 'slider',
+                        min: 7,
+                        max: 15,
+                        step: 2,
+                        onChange: (value) => {
+                            window.gameConfig.visual.gridSize = value;
+                            setupCanvas();
+                            initializeTiles();
+                            render();
+                        }
+                    },
+                    'Tile Size': {
+                        key: 'gameConfig.visual.tileSize',
+                        type: 'slider',
+                        min: 48,
+                        max: 96,
+                        step: 8,
+                        onChange: (value) => {
+                            window.gameConfig.visual.tileSize = value;
+                            setupCanvas();
+                            render();
+                        }
+                    },
+                    'Background Color': {
+                        key: 'gameConfig.visual.backgroundColor',
+                        type: 'color',
+                        onChange: (value) => {
+                            window.gameConfig.visual.backgroundColor = value;
+                            render();
+                        }
+                    }
+                }
+            });
+            
+            if (mode === 'play') {
+                // Initialize game state
+                initializeGame();
+                
+                // Setup event listeners (including orientation/resize)
+                setupEventListeners();
+                
+                // Start game loop
+                lastTime = performance.now();
+                requestAnimationFrame(gameLoop);
+                
+                // Play background music using AudioManager
+                if (audioManager) {
+                    audioManager.playMusic();
+                    console.log('AudioManager: Background music started');
+                }
+                
+                // Initial render
+                render();
+            } else if (mode === 'edit') {
+                // Edit mode: just render the initial state
+                initializeGame();
+                
+                // Setup basic event listeners for edit mode
+                setupEventListeners();
+                
+                render();
+                
+                // Setup basic click handling for edit mode
+                canvas.addEventListener('click', (e) => {
+                    const coords = getGridCoordinates(e.clientX, e.clientY);
+                    const key = getTileKey(coords.x, coords.y);
+                    const tile = tiles[key];
+                    
+                    if (tile) {
+                        lib.log(`Clicked tile at (${coords.x}, ${coords.y}), state: ${tile.state}`);
+                    }
+                });
+            }
+        }
+    </script>
+<script>
+    // 1. Emulando a biblioteca Astrocade para permitir o carregamento
+    window.lib = {
+        log: function(msg) { console.log("Game Log:", msg); },
+        showGameParameters: function(params) { console.log("Parâmetros:", params); },
+        playSound: function(id) { console.log("Som:", id); },
+        
+        // Esta função é a chave para as imagens aparecerem:
+        getAsset: function(name) {
+            console.log("Buscando asset:", name);
+            // Procura a URL no seu asset_map ou usa o nome direto como arquivo
+            return (window.assets && window.assets[name]) ? window.assets[name] : name + ".png";
+        }
+    };
+</script>
+
+<script src="config.js"></script>
+<script src="asset_map.js"></script>
+
+<script>
+    window.onload = function() {
+        console.log("Sistema Astrocade iniciado...");
+        // Garante que o gameConfig esteja disponível globalmente
+        if (typeof config !== 'undefined') window.gameConfig = config;
+        
+        if (typeof run === 'function') {
+            run('play');
+        }
+    };
+</script>
+</script>
+</body>
+</html>
